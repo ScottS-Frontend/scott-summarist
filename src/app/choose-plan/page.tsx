@@ -4,12 +4,11 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useRouter } from "next/navigation";
-import { BsFileText, BsPeople, BsBook } from "react-icons/bs";
-import { FaChevronDown } from "react-icons/fa";
-import { FaHandshake } from "react-icons/fa";
+import { FaFileAlt, FaHandshake } from "react-icons/fa";
 import { RiPlantFill } from "react-icons/ri";
-import { FaFileAlt } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 
+// Plan data
 const plans = [
   {
     id: "yearly",
@@ -27,24 +26,26 @@ const plans = [
   },
 ];
 
+// Feature data with large icons
 const features = [
   {
-    icon: <FaFileAlt className="w-6 h-6" />,
-    text: "Key ideas in few min",
-    subtext: "with many books to read",
+    icon: <FaFileAlt className="w-[60px] h-[60px]" />,
+    title: "Key ideas in few min",
+    description: "with many books to read",
   },
   {
-    icon: <RiPlantFill className="w-6 h-6" />,
-    text: "3 million",
-    subtext: "people growing with Summarist everyday",
+    icon: <RiPlantFill className="w-[60px] h-[60px]" />,
+    title: "3 million",
+    description: "people growing with Summarist everyday",
   },
   {
-    icon: <FaHandshake className="w-6 h-6" />,
-    text: "Precise recommendations",
-    subtext: "collections curated by experts",
+    icon: <FaHandshake className="w-[60px] h-[60px]" />,
+    title: "Precise recommendations",
+    description: "collections curated by experts",
   },
 ];
 
+// FAQ data
 const faqs = [
   {
     question: "How does the free 7-day trial work?",
@@ -68,6 +69,97 @@ const faqs = [
   },
 ];
 
+// Footer links data
+const footerLinks = {
+  actions: ["Summarist Magazine", "Cancel Subscription", "Help", "Contact us"],
+  usefulLinks: ["Pricing", "Summarist Business", "Gift Cards", "Authors & Publishers"],
+  company: ["About", "Careers", "Partners", "Code of Conduct"],
+  other: ["Sitemap", "Legal Notice", "Terms of Service", "Privacy Policies"],
+};
+
+// Semantic style definitions
+const styles = {
+  // Page layout
+  page: "min-h-screen bg-white",
+
+  // Header section - dark blue background with text
+  headerSection: "bg-brand-dark pt-16 pb-8",
+  headerContainer: "max-w-4xl mx-auto px-8 text-center",
+  headerTitle: "text-[48px] font-bold text-white mb-6",
+  headerSubtitle: "text-[20px] text-gray-300",
+
+  // Image section - dark blue with curved bottom, white pill with image
+  imageSection: "bg-brand-dark pb-0",
+  imageSectionRounded: "rounded-b-[260px]",
+  imagePill: "mx-auto bg-white overflow-hidden max-w-[340px]",
+  imagePillRounded: "rounded-t-[180px]",
+  image: "w-full h-auto block",
+
+  // Main content area
+  contentContainer: "max-w-4xl mx-auto px-8 py-12",
+
+  // Features section
+  featuresGrid: "grid grid-cols-3 gap-6 mb-12",
+  featureItem: "flex flex-col items-center text-center gap-2",
+  featureIcon: "text-brand-dark w-[60px] h-[60px]",
+  featureTitle: "text-sm text-brand-dark font-bold",
+  featureDescription: "text-sm text-gray-600",
+
+  // Section headings
+  sectionTitle: "text-xl font-bold text-brand-dark text-center mb-8",
+
+  // Plan selection cards
+  planCard: "flex items-center gap-4 p-6 border-2 rounded-lg cursor-pointer mb-4 transition-all",
+  planCardSelected: "border-brand-green bg-brand-light",
+  planCardUnselected: "border-gray-200 hover:border-gray-300",
+  planRadioCircle: "w-6 h-6 rounded-full border-2 flex items-center justify-center",
+  planRadioCircleSelected: "border-brand-green",
+  planRadioCircleUnselected: "border-gray-300",
+  planRadioDot: "w-3 h-3 rounded-full bg-brand-green",
+  planName: "font-bold text-brand-dark",
+  planPrice: "text-lg font-semibold text-brand-dark",
+  planPricePeriod: "text-sm font-normal text-gray-500",
+  planDescription: "text-sm text-gray-500",
+
+  // Separator
+  separatorContainer: "flex items-center justify-center my-6",
+  separatorText: "text-gray-400 font-medium",
+
+  // Call to action
+  ctaContainer: "text-center",
+  ctaButton: "bg-brand-green hover:bg-brand-green-dark text-white font-semibold py-3 px-8 rounded-lg transition-colors",
+  ctaDisclaimer: "text-sm text-gray-500 mt-4",
+
+  // FAQ accordion
+  faqContainer: "mt-12",
+  faqItem: "border-b border-gray-200",
+  faqQuestion: "flex items-center justify-between py-4 cursor-pointer",
+  faqQuestionText: "font-semibold text-brand-dark",
+  faqIcon: "text-gray-400 transition-transform",
+  faqIconOpen: "rotate-180",
+  faqAnswer: "text-gray-600 pb-4 text-sm leading-relaxed",
+
+  // Footer
+  footer: "bg-brand-light py-12 px-8 mt-12",
+  footerContainer: "max-w-4xl mx-auto",
+  footerGrid: "grid grid-cols-4 gap-8 mb-8",
+  footerColumn: "space-y-2",
+  footerColumnTitle: "font-bold text-brand-dark mb-4",
+  footerLink: "text-sm text-gray-600 hover:underline",
+  footerCopyright: "text-center text-sm text-gray-500",
+};
+
+// Brand colors as Tailwind custom classes
+const brandColors = `
+  .bg-brand-dark { background-color: #032b41; }
+  .text-brand-dark { color: #032b41; }
+  .bg-brand-green { background-color: #2bd97c; }
+  .bg-brand-green-dark { background-color: #20ba68; }
+  .text-brand-green { color: #2bd97c; }
+  .border-brand-green { border-color: #2bd97c; }
+  .bg-brand-light { background-color: #f7faf9; }
+`;
+
 export default function ChoosePlanPage() {
   const { user } = useSelector((state: RootState) => state.auth);
   const router = useRouter();
@@ -82,254 +174,193 @@ export default function ChoosePlanPage() {
     console.log(`Selected plan: ${selectedPlan}`);
   };
 
+  const getPlanCardClasses = (planId: string) => {
+    const isSelected = selectedPlan === planId;
+    return `${styles.planCard} ${
+      isSelected ? styles.planCardSelected : styles.planCardUnselected
+    }`;
+  };
+
+  const getRadioCircleClasses = (planId: string) => {
+    const isSelected = selectedPlan === planId;
+    return `${styles.planRadioCircle} ${
+      isSelected ? styles.planRadioCircleSelected : styles.planRadioCircleUnselected
+    }`;
+  };
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Blue header with rounded bottom corners */}
-      <div
-        className="bg-[#032b41] pt-16 pb-8"
-        style={{
-          borderRadius: "0px",
-        }}
-      >
-        <div className="max-w-4xl mx-auto px-8 text-center">
-          <h1 className="text-4xl font-bold text-white mb-6">
+    <div className={styles.page}>
+      {/* Header Section */}
+      <header className={styles.headerSection}>
+        <div className={styles.headerContainer}>
+          <h1 className={styles.headerTitle}>
             Get unlimited access to many amazing books to read
           </h1>
-          <p className="text-lg text-gray-300">
+          <p className={styles.headerSubtitle}>
             Turn ordinary moments into amazing learning opportunities
           </p>
         </div>
-      </div>
+      </header>
 
-        <div
-        className="bg-[#032b41]"
-        style={{
-          borderRadius: "0px 0px 260px 260px",
-        }}
-      >
-        <div
-          className="mx-auto bg-white overflow-hidden"
-          style={{
-            borderRadius: "180px 180px 0 0", // TOP curved (180px), BOTTOM flat (0)
-            maxWidth: "340px",
-          }}
-        >
+      {/* Image Section with Pill Shape */}
+      <section className={`${styles.imageSection} ${styles.imageSectionRounded}`}>
+        <div className={`${styles.imagePill} ${styles.imagePillRounded}`}>
           <img
             alt="pricing"
             src="/assets/pricing-top.png"
             width="860"
             height="722"
-            className="w-full h-auto block"
+            className={styles.image}
           />
         </div>
-      </div>
+      </section>
 
-      {/* White content section */}
-      <div className="max-w-4xl mx-auto px-8 py-12">
+      {/* Main Content */}
+      <main className={styles.contentContainer}>
         {/* Features */}
-<div className="grid grid-cols-3 gap-6 mb-12">
-  {features.map((feature, idx) => (
-    <div key={idx} className="flex flex-col items-center text-center gap-2">
-      <div className="text-[#032b41] mb-1">{feature.icon}</div>
-      <div className="text-sm text-gray-600">
-        <b className="text-[#032b41]">{feature.text}</b>
-      </div>
-      <div className="text-sm text-gray-600">{feature.subtext}</div>
-    </div>
-  ))}
-</div>
-
-        {/* Section Title */}
-        <div className="text-xl font-bold text-[#032b41] text-center mb-8">
-          Choose the plan that fits you
-        </div>
-
-        {/* Plan Cards */}
-        {plans.map((plan) => (
-          <div
-            key={plan.id}
-            onClick={() => setSelectedPlan(plan.id)}
-            className={`flex items-center gap-4 p-6 border-2 rounded-lg cursor-pointer mb-4 transition-all
-              ${selectedPlan === plan.id ? "border-[#2bd97c] bg-[#f7faf9]" : "border-gray-200 hover:border-gray-300"}
-            `}
-          >
-            <div
-              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center
-              ${selectedPlan === plan.id ? "border-[#2bd97c]" : "border-gray-300"}
-            `}
-            >
-              {selectedPlan === plan.id && (
-                <div className="w-3 h-3 rounded-full bg-[#2bd97c]"></div>
-              )}
-            </div>
-            <div>
-              <div className="font-bold text-[#032b41]">{plan.name}</div>
-              <div className="text-lg font-semibold text-[#032b41]">
-                {plan.price}
-                <span className="text-sm font-normal text-gray-500">
-                  {plan.period}
-                </span>
+        <section className={styles.featuresGrid}>
+          {features.map((feature, idx) => (
+            <article key={idx} className={styles.featureItem}>
+              <div className={styles.featureIcon}>{feature.icon}</div>
+              <div className={styles.featureTitle}>{feature.title}</div>
+              <div className={styles.featureDescription}>
+                {feature.description}
               </div>
-              <div className="text-sm text-gray-500">{plan.description}</div>
-            </div>
-          </div>
-        ))}
+            </article>
+          ))}
+        </section>
+
+        {/* Plan Selection */}
+        <section>
+          <h2 className={styles.sectionTitle}>Choose the plan that fits you</h2>
+
+          {plans.map((plan) => (
+            <article
+              key={plan.id}
+              onClick={() => setSelectedPlan(plan.id)}
+              className={getPlanCardClasses(plan.id)}
+            >
+              <div className={getRadioCircleClasses(plan.id)}>
+                {selectedPlan === plan.id && (
+                  <div className={styles.planRadioDot} />
+                )}
+              </div>
+              <div>
+                <div className={styles.planName}>{plan.name}</div>
+                <div className={styles.planPrice}>
+                  {plan.price}
+                  <span className={styles.planPricePeriod}>{plan.period}</span>
+                </div>
+                <div className={styles.planDescription}>{plan.description}</div>
+              </div>
+            </article>
+          ))}
+        </section>
 
         {/* Separator */}
-        <div className="flex items-center justify-center my-6">
-          <div className="text-gray-400 font-medium">or</div>
+        <div className={styles.separatorContainer}>
+          <span className={styles.separatorText}>or</span>
         </div>
 
-        {/* CTA */}
-        <div className="text-center">
+        {/* Call to Action */}
+        <section className={styles.ctaContainer}>
           <button
             onClick={handleStartTrial}
-            className="bg-[#2bd97c] hover:bg-[#20ba68] text-white font-semibold py-3 px-8 rounded-lg transition-colors"
+            className={styles.ctaButton}
             style={{ width: 300 }}
           >
             Start your free 7-day trial
           </button>
-          <div className="text-sm text-gray-500 mt-4">
-            Cancel your trial at any time before it ends, and you won't be
+          <p className={styles.ctaDisclaimer}>
+            Cancel your trial at any time before it ends, and you won&apos;t be
             charged.
-          </div>
-        </div>
+          </p>
+        </section>
 
         {/* FAQ */}
-        <div className="mt-12">
+        <section className={styles.faqContainer}>
           {faqs.map((faq, idx) => (
-            <div key={idx} className="border-b border-gray-200">
+            <article key={idx} className={styles.faqItem}>
               <div
-                className="flex items-center justify-between py-4 cursor-pointer"
+                className={styles.faqQuestion}
                 onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
               >
-                <div className="font-semibold text-[#032b41]">
-                  {faq.question}
-                </div>
+                <h3 className={styles.faqQuestionText}>{faq.question}</h3>
                 <FaChevronDown
-                  className={`text-gray-400 transition-transform ${openFaq === idx ? "rotate-180" : ""}`}
+                  className={`${styles.faqIcon} ${
+                    openFaq === idx ? styles.faqIconOpen : ""
+                  }`}
                 />
               </div>
               {openFaq === idx && (
-                <div className="text-gray-600 pb-4 text-sm leading-relaxed">
-                  {faq.answer}
-                </div>
+                <p className={styles.faqAnswer}>{faq.answer}</p>
               )}
-            </div>
+            </article>
           ))}
-        </div>
-      </div>
+        </section>
+      </main>
 
       {/* Footer */}
-      <footer className="bg-[#f7faf9] py-12 px-8 mt-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-4 gap-8 mb-8 text-sm text-gray-600">
-            <div>
-              <div className="font-bold text-[#032b41] mb-4">Actions</div>
-              <div className="space-y-2">
-                <div>
-                  <a href="#" className="hover:underline">
-                    Summarist Magazine
+      <footer className={styles.footer}>
+        <div className={styles.footerContainer}>
+          <div className={styles.footerGrid}>
+            {/* Actions */}
+            <div className={styles.footerColumn}>
+              <h4 className={styles.footerColumnTitle}>Actions</h4>
+              {footerLinks.actions.map((link) => (
+                <div key={link}>
+                  <a href="#" className={styles.footerLink}>
+                    {link}
                   </a>
                 </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Cancel Subscription
-                  </a>
-                </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Help
-                  </a>
-                </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Contact us
-                  </a>
-                </div>
-              </div>
+              ))}
             </div>
-            <div>
-              <div className="font-bold text-[#032b41] mb-4">Useful Links</div>
-              <div className="space-y-2">
-                <div>
-                  <a href="#" className="hover:underline">
-                    Pricing
+
+            {/* Useful Links */}
+            <div className={styles.footerColumn}>
+              <h4 className={styles.footerColumnTitle}>Useful Links</h4>
+              {footerLinks.usefulLinks.map((link) => (
+                <div key={link}>
+                  <a href="#" className={styles.footerLink}>
+                    {link}
                   </a>
                 </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Summarist Business
-                  </a>
-                </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Gift Cards
-                  </a>
-                </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Authors & Publishers
-                  </a>
-                </div>
-              </div>
+              ))}
             </div>
-            <div>
-              <div className="font-bold text-[#032b41] mb-4">Company</div>
-              <div className="space-y-2">
-                <div>
-                  <a href="#" className="hover:underline">
-                    About
+
+            {/* Company */}
+            <div className={styles.footerColumn}>
+              <h4 className={styles.footerColumnTitle}>Company</h4>
+              {footerLinks.company.map((link) => (
+                <div key={link}>
+                  <a href="#" className={styles.footerLink}>
+                    {link}
                   </a>
                 </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Careers
-                  </a>
-                </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Partners
-                  </a>
-                </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Code of Conduct
-                  </a>
-                </div>
-              </div>
+              ))}
             </div>
-            <div>
-              <div className="font-bold text-[#032b41] mb-4">Other</div>
-              <div className="space-y-2">
-                <div>
-                  <a href="#" className="hover:underline">
-                    Sitemap
+
+            {/* Other */}
+            <div className={styles.footerColumn}>
+              <h4 className={styles.footerColumnTitle}>Other</h4>
+              {footerLinks.other.map((link) => (
+                <div key={link}>
+                  <a href="#" className={styles.footerLink}>
+                    {link}
                   </a>
                 </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Legal Notice
-                  </a>
-                </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Terms of Service
-                  </a>
-                </div>
-                <div>
-                  <a href="#" className="hover:underline">
-                    Privacy Policies
-                  </a>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
-          <div className="text-center text-sm text-gray-500">
+
+          <p className={styles.footerCopyright}>
             Copyright © 2023 Summarist.
-          </div>
+          </p>
         </div>
       </footer>
+
+      {/* Inject brand color styles */}
+      <style>{brandColors}</style>
     </div>
   );
 }

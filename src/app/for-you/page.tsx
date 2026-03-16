@@ -9,6 +9,7 @@ import Sidebar from "@/components/Sidebar";
 import BookImage from "@/components/BookImage";
 import { useRouter } from "next/navigation";
 import { useAudioDuration } from "@/hooks/useAudioDuration";
+import { useSelector } from "react-redux";
 
 // Helper to format seconds to MM:SS
 function formatDuration(seconds: number | null): string {
@@ -21,17 +22,27 @@ function formatDuration(seconds: number | null): string {
 // Component for Selected Book with dynamic duration
 function SelectedBookCard({ book }: { book: Book }) {
   const router = useRouter();
+  const { user } = useSelector((state: RootState) => state.auth);
   const audioDuration = useAudioDuration(book.audioLink);
+  
+  const isPremium = user?.subscription === 'premium' || user?.subscription === 'premium-plus';
+  const showPremiumPill = book.subscriptionRequired && !isPremium;
 
   return (
     <a
       href={`/book/${book.id}`}
-      className="bg-[#fbefd6] rounded-lg p-6 shadow-sm border border-[#f0e6d2] cursor-pointer hover:shadow-md transition-shadow w-[624px] h-[188px] flex items-center no-underline mb-6"
+      className="bg-[#fbefd6] rounded-lg p-6 shadow-sm border border-[#f0e6d2] cursor-pointer hover:shadow-md transition-shadow w-[624px] h-[188px] flex items-center no-underline mb-6 relative"
       onClick={(e) => {
         e.preventDefault();
         router.push(`/book/${book.id}`);
       }}
     >
+      {/* Premium Pill */}
+      {showPremiumPill && (
+        <div className="absolute top-3 right-3 z-20 bg-[#032b41] text-white text-xs font-bold px-3 py-1 rounded-full">
+          Premium
+        </div>
+      )}
       {/* Subtitle - left side */}
       <div className="flex-1 pr-6 text-lg text-gray-700 italic font-medium leading-relaxed">
         &ldquo;{book.subTitle}&rdquo;

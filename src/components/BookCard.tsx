@@ -3,6 +3,8 @@
 
 import { Book } from '@/types';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 import BookImage from './BookImage';
 import { useAudioDuration } from '@/hooks/useAudioDuration';
 import { BsClock, BsStar } from 'react-icons/bs';
@@ -22,13 +24,27 @@ interface BookCardProps {
 // THIS IS THE COMPONENT FOR RECOMMENDED/SUGGESTED GRID ITEMS
 export default function BookCard({ book }: BookCardProps) {
   const router = useRouter();
+  const { user } = useSelector((state: RootState) => state.auth);
   const audioDuration = useAudioDuration(book.audioLink);
+
+  // Check if user is premium
+  const isPremium = user?.subscription === 'premium' || user?.subscription === 'premium-plus';
+  
+  // Show Premium pill if book requires subscription AND user is NOT premium
+  const showPremiumPill = book.subscriptionRequired && !isPremium;
 
   return (
     <div 
       onClick={() => router.push(`/book/${book.id}`)}
-      className="cursor-pointer group"
+      className="cursor-pointer group relative"
     >
+      {/* Premium Pill - Upper Right Corner */}
+      {showPremiumPill && (
+        <div className="absolute top-2 right-2 z-20 bg-[#032b41] text-white text-xs font-bold px-3 py-1 rounded-full">
+          Premium
+        </div>
+      )}
+
       {/* Fixed height container for BookImage */}
       <div className="w-full h-48 mb-2">
         <BookImage 

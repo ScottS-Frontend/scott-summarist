@@ -51,14 +51,6 @@ export default function BookDetailPage() {
   // Get dynamic duration from audio file
   const audioDuration = useAudioDuration(book?.audioLink);
 
-  const handleReadListen = () => {
-    if (!user) {
-      dispatch(openModal('login'));
-      return;
-    }
-    router.push(`/player/${id}`);
-  };
-
   const handleAddToLibrary = () => {
     if (!user) {
       dispatch(openModal('login'));
@@ -80,6 +72,27 @@ export default function BookDetailPage() {
 
   if (!book) return <div>Book not found</div>;
 
+  // PREMIUM LOGIC - only after book is loaded
+  const isPremium = user?.subscription === 'premium' || user?.subscription === 'premium-plus';
+  const showPremiumLabel = book.subscriptionRequired && !isPremium;
+
+  // Handle Read/Listen button click
+  const handleReadListen = () => {
+    if (!user) {
+      dispatch(openModal('login'));
+      return;
+    }
+    
+    // If book requires subscription and user is NOT premium, go to choose-plan
+    if (book.subscriptionRequired && !isPremium) {
+      router.push('/choose-plan');
+      return;
+    }
+    
+    // Otherwise, go to player
+    router.push(`/player/${id}`);
+  };
+
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
@@ -93,7 +106,13 @@ export default function BookDetailPage() {
           <div className="flex gap-12">
             {/* Left Side - Book Info */}
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-[#032b41] mb-2">{book.title}</h1>
+              {/* Title with Premium label */}
+              <h1 className="text-3xl font-bold text-[#032b41] mb-2">
+                {book.title}
+                {showPremiumLabel && (
+                  <span className="text-gray-400 font-normal ml-2">(Premium)</span>
+                )}
+              </h1>
               <p className="text-lg text-gray-600 mb-1">{book.author}</p>
               <p className="text-[18px] text-gray-500 mb-4">{book.subTitle}</p>
 
@@ -110,7 +129,6 @@ export default function BookDetailPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <BsClock className="w-4 h-4" />
-                    {/* DYNAMIC DURATION */}
                     <span>{formatDuration(audioDuration)}</span>
                   </div>
                 </div>
