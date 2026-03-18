@@ -1,4 +1,3 @@
-// src/components/BookCard.tsx
 "use client";
 
 import { Book } from "@/types";
@@ -25,14 +24,16 @@ interface BookCardProps {
 export default function BookCard({ book }: BookCardProps) {
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.auth);
+  const { subscription } = useSelector((state: RootState) => state.subscription);
   const audioDuration = useAudioDuration(book.audioLink);
 
-  // Check if user is premium
-  const isPremium =
-    user?.subscription === "premium" || user?.subscription === "premium-plus";
+  // Check if user has active subscription from subscriptionSlice
+  const hasActiveSubscription =
+    subscription &&
+    (subscription.status === "active" || subscription.status === "trialing");
 
-  // Show Premium pill if book requires subscription AND user is NOT premium
-  const showPremiumPill = book.subscriptionRequired && !isPremium;
+  // Show Premium pill if book requires subscription AND user does NOT have active subscription
+  const showPremiumPill = book.subscriptionRequired && !hasActiveSubscription;
 
   return (
     <div
