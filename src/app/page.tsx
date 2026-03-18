@@ -53,7 +53,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-white font-roboto">
       <AuthModal />
       
-      {/* Navbar */}
+      {/* Navbar - Always shows guest menu */}
       <nav className="py-10 bg-white">
         <div className="flex justify-between items-center max-w-[1070px] w-full h-full mx-auto px-6">
           <figure className="max-w-[200px]">
@@ -67,26 +67,15 @@ export default function HomePage() {
           </figure>
           
           <ul className="flex gap-6 list-none m-0 p-0">
-            {user ? (
-              <li 
-                className="bg-[#2bd97c] text-[#032b41] px-6 py-2 rounded cursor-pointer hover:bg-[#20ba68] transition-colors font-medium min-w-[180px] text-center flex items-center justify-center h-10 m-0"
-                onClick={() => router.push('/for-you')}
-              >
-                Go to App
-              </li>
-            ) : (
-              <>
-                <li 
-                  className="text-[#032b41] cursor-pointer hover:text-[#2bd97c] transition-colors font-normal m-0"
-                  onClick={() => dispatch(openModal('login'))}
-                >
-                  Login
-                </li>
-                <li className="text-[#032b41] cursor-not-allowed hidden md:block m-0">About</li>
-                <li className="text-[#032b41] cursor-not-allowed hidden md:block m-0">Contact</li>
-                <li className="text-[#032b41] cursor-not-allowed hidden md:block m-0">Help</li>
-              </>
-            )}
+            <li 
+              className="text-[#032b41] cursor-pointer hover:text-[#2bd97c] transition-colors font-normal m-0"
+              onClick={() => dispatch(openModal('login'))}
+            >
+              Login
+            </li>
+            <li className="text-[#032b41] cursor-not-allowed hidden md:block m-0">About</li>
+            <li className="text-[#032b41] cursor-not-allowed hidden md:block m-0">Contact</li>
+            <li className="text-[#032b41] cursor-not-allowed hidden md:block m-0">Help</li>
           </ul>
         </div>
       </nav>

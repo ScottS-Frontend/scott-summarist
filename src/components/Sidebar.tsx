@@ -15,12 +15,23 @@ import {
 import { logoutUser } from '@/store/authSlice';
 import { openModal } from '@/store/modalSlice';
 import { RootState } from '@/store/store';
+import FontSizeSelector from './FontSizeSelector';
+import type { AppDispatch } from '@/store/store';
 
-export default function Sidebar() {
-  const dispatch = useDispatch();
+interface SidebarProps {
+  onFontSizeChange?: (size: 'small' | 'medium' | 'large' | 'xlarge') => void;
+  currentFontSize?: 'small' | 'medium' | 'large' | 'xlarge';
+}
+
+export default function Sidebar({ onFontSizeChange, currentFontSize = 'medium' }: SidebarProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useSelector((state: RootState) => state.auth);
+
+  // Check if we're on the player page
+  const isPlayerPage = pathname?.startsWith('/player/') || false;
+  console.log("Sidebar props:", { isPlayerPage, currentFontSize, onFontSizeChange: !!onFontSizeChange });
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -72,6 +83,19 @@ export default function Sidebar() {
             <span className="font-medium">{item.label}</span>
           </button>
         ))}
+
+        {/* Font Size Selector - Only on Player Page */}
+        {isPlayerPage && (
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            
+            <div className="px-4">
+              <FontSizeSelector 
+                currentSize={currentFontSize} 
+                onSizeChange={onFontSizeChange || (() => {})} 
+              />
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Bottom Menu */}

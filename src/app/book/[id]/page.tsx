@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { Book } from '@/types';
-import { RootState } from '@/store/store';
+import { AppDispatch, RootState } from '@/store/store';
 import { openModal } from '@/store/modalSlice';
+import { loadSubscription } from '@/store/subscriptionSlice';
 import Sidebar from '@/components/Sidebar';
 import SearchBar from '@/components/SearchBar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,13 +26,24 @@ function formatDuration(seconds: number | null): string {
 export default function BookDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
+  // Get subscription AND loading state from Redux
+  const { subscription, loading: subscriptionLoading } = useSelector((state: RootState) => state.subscription);
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Load subscription when page mounts
+  useEffect(() => {
+    if (user) {
+      dispatch(loadSubscription());
+    }
+  }, [user, dispatch]);
+
+  // Fetch book
   useEffect(() => {
     const fetchBook = async () => {
+      setLoading(true);
       try {
         const res = await fetch(
           `https://us-central1-summaristt.cloudfunctions.net/getBook?id=${id}`
@@ -41,11 +53,14 @@ export default function BookDetailPage() {
         setBook(data);
       } catch (error) {
         console.error('Error fetching book:', error);
+        setBook(null);
       }
       setLoading(false);
     };
 
-    fetchBook();
+    if (id) {
+      fetchBook();
+    }
   }, [id]);
 
   // Get dynamic duration from audio file
@@ -72,9 +87,10 @@ export default function BookDetailPage() {
 
   if (!book) return <div>Book not found</div>;
 
-  // PREMIUM LOGIC - only after book is loaded
-  const isPremium = user?.subscription === 'premium' || user?.subscription === 'premium-plus';
-  const showPremiumLabel = book.subscriptionRequired && !isPremium;
+  // FIXED PREMIUM LOGIC - check subscription from Redux
+  const hasActiveSubscription = subscription && (subscription.status === 'active' || subscription.status === 'trialing');
+  const showPremiumLabel = book.subscriptionRequired && !hasActiveSubscription;
+  const needsSubscription = book.subscriptionRequired === true;
 
   // Handle Read/Listen button click
   const handleReadListen = () => {
@@ -83,8 +99,14 @@ export default function BookDetailPage() {
       return;
     }
     
-    // If book requires subscription and user is NOT premium, go to choose-plan
-    if (book.subscriptionRequired && !isPremium) {
+    // Wait for subscription to load
+    if (subscriptionLoading) {
+      alert('Please wait, checking your subscription...');
+      return;
+    }
+    
+    // If book requires subscription and user does NOT have active subscription, go to choose-plan
+    if (needsSubscription && !hasActiveSubscription) {
       router.push('/choose-plan');
       return;
     }
@@ -103,6 +125,11 @@ export default function BookDetailPage() {
         </header>
 
         <div className="max-w-6xl mx-auto px-8 py-12">
+          {/* Loading message when checking subscription */}
+          {subscriptionLoading && needsSubscription && (
+            <div className="text-sm text-gray-500 mb-4">Checking subscription...</div>
+          )}
+
           <div className="flex gap-12">
             {/* Left Side - Book Info */}
             <div className="flex-1">
@@ -152,7 +179,8 @@ export default function BookDetailPage() {
               <div className="flex gap-4 mb-6">
                 <button
                   onClick={handleReadListen}
-                  className="flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors"
+                  disabled={subscriptionLoading && needsSubscription}
+                  className={`flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors ${subscriptionLoading && needsSubscription ? 'opacity-50 cursor-wait' : ''}`}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 1024 1024" fill="currentColor">
                     <path d="M928 161H699.2c-49.1 0-97.1 14.1-138.4 40.7L512 233l-48.8-31.3A255.2 255.2 0 0 0 324.8 161H96c-17.7 0-32 14.3-32 32v568c0 17.7 14.3 32 32 32h228.8c49.1 0 97.1 14.1 138.4 40.7l44.4 28.6c1.3.8 2.8 1.3 4.3 1.3s3-.4 4.3-1.3l44.4-28.6C602 807.1 650.1 793 699.2 793H928c17.7 0 32-14.3 32-32V193c0-17.7-14.3-32-32-32zM324.8 721H136V233h188.8c35.4 0 69.8 10.1 99.5 29.2l48.8 31.3 6.9 4.5v462c-47.6-25.6-100.8-39-155.2-39zm563.2 0H699.2c-54.4 0-107.6 13.4-155.2 39V298l6.9-4.5 48.8-31.3c29.7-19.1 64.1-29.2 99.5-29.2H888v488zM396.9 361H211.1c-3.9 0-7.1 3.4-7.1 7.5v45c0 4.1 3.2 7.5 7.1 7.5h185.7c3.9 0 7.1-3.4 7.1-7.5v-45c.1-4.1-3.1-7.5-7-7.5zm223.1 7.5v45c0 4.1 3.2 7.5 7.1 7.5h185.7c3.9 0 7.1-3.4 7.1-7.5v-45c0-4.1-3.2-7.5-7.1-7.5H627.1c-3.9 0-7.1 3.4-7.1 7.5zM396.9 501H211.1c-3.9 0-7.1 3.4-7.1 7.5v45c0 4.1 3.2 7.5 7.1 7.5h185.7c3.9 0 7.1-3.4 7.1-7.5v-45c.1-4.1-3.1-7.5-7-7.5zm416 0H627.1c-3.9 0-7.1 3.4-7.1 7.5v45c0 4.1 3.2 7.5 7.1 7.5h185.7c3.9 0 7.1-3.4 7.1-7.5v-45c.1-4.1-3.1-7.5-7-7.5z"/>
@@ -161,7 +189,8 @@ export default function BookDetailPage() {
                 </button>
                 <button
                   onClick={handleReadListen}
-                  className="flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors"
+                  disabled={subscriptionLoading && needsSubscription}
+                  className={`flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors ${subscriptionLoading && needsSubscription ? 'opacity-50 cursor-wait' : ''}`}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 1024 1024" fill="currentColor">
                     <path d="M842 454c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8 0 140.3-113.7 254-254 254S258 594.3 258 454c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8 0 168.7 126.6 307.9 290 327.6V884H326.7c-13.7 0-24.7 14.3-24.7 32v36c0 4.4 2.8 8 6.2 8h407.6c3.4 0 6.2-3.6 6.2-8v-36c0-17.7-11-32-24.7-32H548V782.1c165.3-18 294-158 294-328.1zM512 624c93.9 0 170-75.2 170-168V232c0-92.8-76.1-168-170-168s-170 75.2-170 168v224c0 92.8 76.1 168 170 168zm-94-392c0-50.6 41.9-92 94-92s94 41.4 94 92v224c0 50.6-41.9 92-94 92s-94-41.4-94-92V232z"/>

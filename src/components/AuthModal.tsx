@@ -11,9 +11,10 @@ import { RootState } from "@/store/store";
 import { FcGoogle } from "react-icons/fc";
 import { useRouter } from "next/navigation";
 import { BsPersonFill } from "react-icons/bs";
+import type { AppDispatch } from '@/store/store';
 
 export default function AuthModal() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { isOpen, modalType } = useSelector((state: RootState) => state.modal);
   const { error, loading, user } = useSelector(
