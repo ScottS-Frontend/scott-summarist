@@ -7,6 +7,7 @@ import { Book } from "@/types";
 import { AppDispatch, RootState } from "@/store/store";
 import { openModal } from "@/store/modalSlice";
 import { loadSubscription } from "@/store/subscriptionSlice";
+import { addToLibrary } from "@/store/library/librarySlice";
 import Sidebar from "@/components/Sidebar";
 import SearchBar from "@/components/SearchBar";
 import { BsBookmark, BsStar, BsClock, BsLightbulb } from "react-icons/bs";
@@ -28,12 +29,16 @@ export default function BookDetailPage() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
-  // Get subscription AND loading state from Redux
   const { subscription, loading: subscriptionLoading } = useSelector(
     (state: RootState) => state.subscription,
   );
+  const { savedBooks } = useSelector((state: RootState) => state.library);
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdding, setIsAdding] = useState(false);
+
+  // Check if book is already saved
+  const isBookSaved = savedBooks.some((b) => b.bookId === id);
 
   // Load subscription when page mounts
   useEffect(() => {
@@ -67,13 +72,27 @@ export default function BookDetailPage() {
   // Get dynamic duration from audio file
   const audioDuration = useAudioDuration(book?.audioLink);
 
-  const handleAddToLibrary = () => {
-    if (!user) {
-      dispatch(openModal("login"));
-      return;
-    }
-    alert("Added to library! (Not implemented yet)");
-  };
+  const handleAddToLibrary = async () => {
+  if (!user) {
+    dispatch(openModal("login"));
+    return;
+  }
+
+  if (isBookSaved) {
+    alert("This book is already in your library!");
+    return;
+  }
+
+  setIsAdding(true);
+  try {
+    await dispatch(addToLibrary(id as string)).unwrap();
+    alert("Added to library!");
+  } catch (error: any) {
+    console.error("Full error:", error);
+    alert(`Failed to add book: ${error.message || error}`);
+  }
+  setIsAdding(false);
+};
 
   if (loading) {
     return <SkeletonBookDetail />;
@@ -209,12 +228,23 @@ export default function BookDetailPage() {
 
               {/* Bookmark - Bold */}
               <button
-                onClick={handleAddToLibrary}
-                className="flex items-center gap-2 text-[#0365f2] hover:text-blue-700 mb-10 transition-colors font-bold"
-              >
-                <BsBookmark className="w-5 h-5" />
-                <span className="text-sm">Add title to My Library</span>
-              </button>
+  onClick={handleAddToLibrary}
+  disabled={isAdding || isBookSaved}
+  className={`flex items-center gap-2 text-[#0365f2] hover:text-blue-700 mb-10 transition-colors font-bold cursor-pointer ${
+    isBookSaved || isAdding ? "opacity-50 cursor-not-allowed" : ""
+  }`}
+>
+  <BsBookmark
+    className={`w-5 h-5 ${isBookSaved ? "fill-current" : ""}`}
+  />
+  <span className="text-sm">
+    {isBookSaved
+      ? "In My Library"
+      : isAdding
+        ? "Adding..."
+        : "Add title to My Library"}
+  </span>
+</button>
 
               {/* What's it about? */}
               <h2 className="text-lg font-bold text-[#032b41] mb-4">

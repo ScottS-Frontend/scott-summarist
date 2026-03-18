@@ -30,3 +30,21 @@ export interface User {
   photoURL: string | null;
   subscription?: 'free' | 'basic' | 'premium' | 'premium-plus';
 }
+
+// NEW: UserBook for library
+export interface UserBook {
+  bookId: string;
+  savedAt: string;
+  currentTime: number;
+  duration: number;
+  finished: boolean;
+  finishedAt?: string;
+  lastAccessedAt: string;
+}
+
+export interface LibraryState {
+  savedBooks: UserBook[];
+  finishedBooks: UserBook[];
+  loading: boolean;
+  error: string | null;
+}

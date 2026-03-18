@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { Book } from "@/types";
-import { RootState } from "@/store/store";
+import { RootState, AppDispatch } from "@/store/store";
 import { openModal } from "@/store/modalSlice";
+import { loadLibrary, updateBookProgress } from "@/store/library/librarySlice";
 import Sidebar from "@/components/Sidebar";
 import SearchBar from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
@@ -19,8 +20,9 @@ import {
 export default function PlayerPage() {
   const { id } = useParams();
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
+  const { savedBooks } = useSelector((state: RootState) => state.library);
   const [book, setBook] = useState<Book | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -31,6 +33,11 @@ export default function PlayerPage() {
     "small" | "medium" | "large" | "xlarge"
   >("medium");
 
+  // Check if this book is in user's library
+  const savedBook = savedBooks.find((b) => b.bookId === id);
+  const isInLibrary = !!savedBook;
+
+  // Fetch book data
   useEffect(() => {
     const fetchBook = async () => {
       setLoading(true);
@@ -52,12 +59,47 @@ export default function PlayerPage() {
     }
   }, [id]);
 
+  // Load library and restore progress
+  useEffect(() => {
+    if (user) {
+      dispatch(loadLibrary());
+    }
+  }, [user, dispatch]);
+
+  // Restore saved progress when audio loads
+  useEffect(() => {
+    if (savedBook && audioRef.current && savedBook.currentTime > 0) {
+      audioRef.current.currentTime = savedBook.currentTime;
+      setCurrentTime(savedBook.currentTime);
+    }
+  }, [savedBook]);
+
+  // Load font size preference
   useEffect(() => {
     const saved = localStorage.getItem("playerFontSize");
     if (saved) {
       setFontSize(saved as "small" | "medium" | "large" | "xlarge");
     }
   }, []);
+
+  // Save progress periodically
+  useEffect(() => {
+    if (!user || !book || !audioRef.current) return;
+
+    const interval = setInterval(() => {
+      if (audioRef.current && isPlaying) {
+        dispatch(
+          updateBookProgress({
+            bookId: book.id,
+            currentTime: audioRef.current.currentTime,
+            duration: audioRef.current.duration || 0,
+          }),
+        );
+      }
+    }, 5000); // Save every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [user, book, isPlaying, dispatch]);
 
   const handleFontSizeChange = (
     size: "small" | "medium" | "large" | "xlarge",
@@ -108,6 +150,20 @@ export default function PlayerPage() {
       audioRef.current.currentTime += seconds;
     }
   };
+
+  // Handle audio ended - mark as finished
+  const handleEnded = useCallback(() => {
+    setIsPlaying(false);
+    if (user && book && audioRef.current) {
+      dispatch(
+        updateBookProgress({
+          bookId: book.id,
+          currentTime: audioRef.current.duration,
+          duration: audioRef.current.duration,
+        }),
+      );
+    }
+  }, [user, book, dispatch]);
 
   if (loading) {
     return (
@@ -231,7 +287,7 @@ export default function PlayerPage() {
             src={book.audioLink || ""}
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
-            onEnded={() => setIsPlaying(false)}
+            onEnded={handleEnded}
           />
 
           <div className="flex items-center justify-between h-12">
