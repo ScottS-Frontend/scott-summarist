@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { openModal } from "@/store/modalSlice";
-import { loadSubscription } from '../../store/subscriptionSlice';
+import { loadSubscription } from "../../store/subscriptionSlice";
 import Sidebar from "@/components/Sidebar";
 import SearchBar from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";

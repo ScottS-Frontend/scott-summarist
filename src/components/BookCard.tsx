@@ -1,20 +1,20 @@
 // src/components/BookCard.tsx
-'use client';
+"use client";
 
-import { Book } from '@/types';
-import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store/store';
-import BookImage from './BookImage';
-import { useAudioDuration } from '@/hooks/useAudioDuration';
-import { BsClock, BsStar } from 'react-icons/bs';
+import { Book } from "@/types";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import BookImage from "./BookImage";
+import { useAudioDuration } from "@/hooks/useAudioDuration";
+import { BsClock, BsStar } from "react-icons/bs";
 
 // Helper to format seconds to MM:SS
 function formatDuration(seconds: number | null): string {
-  if (!seconds || isNaN(seconds)) return '--:--';
+  if (!seconds || isNaN(seconds)) return "--:--";
   const min = Math.floor(seconds / 60);
   const sec = seconds % 60;
-  return `${min}:${sec < 10 ? '0' + sec : sec}`;
+  return `${min}:${sec < 10 ? "0" + sec : sec}`;
 }
 
 interface BookCardProps {
@@ -28,13 +28,14 @@ export default function BookCard({ book }: BookCardProps) {
   const audioDuration = useAudioDuration(book.audioLink);
 
   // Check if user is premium
-  const isPremium = user?.subscription === 'premium' || user?.subscription === 'premium-plus';
-  
+  const isPremium =
+    user?.subscription === "premium" || user?.subscription === "premium-plus";
+
   // Show Premium pill if book requires subscription AND user is NOT premium
   const showPremiumPill = book.subscriptionRequired && !isPremium;
 
   return (
-    <div 
+    <div
       onClick={() => router.push(`/book/${book.id}`)}
       className="cursor-pointer group relative"
     >
@@ -47,8 +48,8 @@ export default function BookCard({ book }: BookCardProps) {
 
       {/* Fixed height container for BookImage */}
       <div className="w-full h-48 mb-2">
-        <BookImage 
-          book={book} 
+        <BookImage
+          book={book}
           className="w-full h-full"
           showHoverEffect={true}
           showHalfCircle={true}
@@ -62,12 +63,12 @@ export default function BookCard({ book }: BookCardProps) {
           {book.title}
         </h3>
         <p className="text-gray-500 text-xs">{book.author}</p>
-        
+
         {/* Full subtitle - no truncation */}
         <p className="text-gray-400 text-xs leading-relaxed">
-          {book.subTitle || ''}
+          {book.subTitle || ""}
         </p>
-        
+
         {/* Bottom row - Duration and Rating */}
         <div className="flex items-center gap-3 text-gray-500 text-xs pt-2">
           {/* Duration */}
@@ -75,7 +76,7 @@ export default function BookCard({ book }: BookCardProps) {
             <BsClock className="w-3 h-3" />
             <span>{formatDuration(audioDuration)}</span>
           </div>
-          
+
           {/* Rating */}
           <div className="flex items-center gap-1">
             <BsStar className="w-3 h-3 text-black fill-black" />

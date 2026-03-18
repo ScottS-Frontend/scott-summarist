@@ -11,7 +11,7 @@ import { RootState } from "@/store/store";
 import { FcGoogle } from "react-icons/fc";
 import { useRouter } from "next/navigation";
 import { BsPersonFill } from "react-icons/bs";
-import type { AppDispatch } from '@/store/store';
+import type { AppDispatch } from "@/store/store";
 
 export default function AuthModal() {
   const dispatch = useDispatch<AppDispatch>();
@@ -49,9 +49,9 @@ export default function AuthModal() {
   };
 
   const handleGoogleLogin = () => {
-  // UI only - Google login not implemented yet
-  alert("Google login coming soon! Please use email login.");
-};
+    // UI only - Google login not implemented yet
+    alert("Google login coming soon! Please use email login.");
+  };
 
   const showRegister = modalType === "register" || isRegister;
 
@@ -147,6 +147,7 @@ export default function AuthModal() {
               required
               className="h-12 border-gray-300 focus:border-[#2bd97c] focus:ring-[#2bd97c]"
             />
+
             <Button
               type="submit"
               disabled={loading}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export function useAudioDuration(audioUrl: string | undefined): number | null {
   const [duration, setDuration] = useState<number | null>(null);
@@ -7,7 +7,7 @@ export function useAudioDuration(audioUrl: string | undefined): number | null {
     if (!audioUrl) return;
 
     const audio = new Audio(audioUrl);
-    
+
     const handleLoadedMetadata = () => {
       if (audio.duration && !isNaN(audio.duration)) {
         setDuration(Math.floor(audio.duration));
@@ -15,18 +15,18 @@ export function useAudioDuration(audioUrl: string | undefined): number | null {
     };
 
     const handleError = () => {
-      console.error('Failed to load audio metadata');
+      console.error("Failed to load audio metadata");
       setDuration(null);
     };
 
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('error', handleError);
-    audio.preload = 'metadata';
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audio.addEventListener("error", handleError);
+    audio.preload = "metadata";
 
     return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('error', handleError);
-      audio.src = '';
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("error", handleError);
+      audio.src = "";
     };
   }, [audioUrl]);
 

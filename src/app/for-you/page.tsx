@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { Book } from "@/types";
 import BookCard from "@/components/BookCard";
-import SkeletonBookCard from "@/components/SkeletonBookCard";
 import SearchBar from "@/components/SearchBar";
 import Sidebar from "@/components/Sidebar";
 import BookImage from "@/components/BookImage";
 import { useRouter } from "next/navigation";
 import { useAudioDuration } from "@/hooks/useAudioDuration";
 import { useSelector } from "react-redux";
+import SkeletonForYou from "@/components/SkeletonForYou";
+import { RootState } from "@/store/store";
 
 // Helper to format seconds to MM:SS
 function formatDuration(seconds: number | null): string {
@@ -24,8 +25,9 @@ function SelectedBookCard({ book }: { book: Book }) {
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.auth);
   const audioDuration = useAudioDuration(book.audioLink);
-  
-  const isPremium = user?.subscription === 'premium' || user?.subscription === 'premium-plus';
+
+  const isPremium =
+    user?.subscription === "premium" || user?.subscription === "premium-plus";
   const showPremiumPill = book.subscriptionRequired && !isPremium;
 
   return (
@@ -55,15 +57,15 @@ function SelectedBookCard({ book }: { book: Book }) {
       <div className="flex items-center gap-4 flex-shrink-0">
         {/* Book Image - using BookImage component */}
         <div className="w-[140px] h-[140px]">
-          <BookImage 
-            book={book} 
+          <BookImage
+            book={book}
             className="w-full h-full"
             showHoverEffect={false}
             showHalfCircle={true}
             circleSize="medium"
           />
         </div>
-        
+
         {/* Text content */}
         <div className="flex flex-col gap-1">
           <div className="font-bold text-[#032b41] text-lg">{book.title}</div>
@@ -102,13 +104,13 @@ export default function ForYouPage() {
       try {
         const [selectedRes, recommendedRes, suggestedRes] = await Promise.all([
           fetch(
-            "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=selected"
+            "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=selected",
           ),
           fetch(
-            "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=recommended"
+            "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=recommended",
           ),
           fetch(
-            "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=suggested"
+            "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=suggested",
           ),
         ]);
 
@@ -132,6 +134,10 @@ export default function ForYouPage() {
     fetchBooks();
   }, []);
 
+  if (loading) {
+    return <SkeletonForYou />;
+  }
+
   return (
     <div className="flex min-h-screen bg-[#f7faf9] overflow-x-hidden">
       <Sidebar />
@@ -148,13 +154,7 @@ export default function ForYouPage() {
             <h2 className="text-[22px] font-bold text-[#032b41] mb-6">
               Selected just for you
             </h2>
-            {loading ? (
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100 w-[624px] h-[188px]">
-                <div className="h-full bg-gray-200 animate-pulse rounded" />
-              </div>
-            ) : selectedBook ? (
-              <SelectedBookCard book={selectedBook} />
-            ) : null}
+            {selectedBook ? <SelectedBookCard book={selectedBook} /> : null}
           </section>
 
           {/* Recommended Books */}
@@ -165,13 +165,9 @@ export default function ForYouPage() {
               </h2>
             </div>
             <div className="grid grid-cols-5 gap-5">
-              {loading
-                ? Array(5)
-                    .fill(0)
-                    .map((_, i) => <SkeletonBookCard key={i} />)
-                : recommendedBooks
-                    .slice(0, 5)
-                    .map((book) => <BookCard key={book.id} book={book} />)}
+              {recommendedBooks.slice(0, 5).map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))}
             </div>
           </section>
 
@@ -183,13 +179,9 @@ export default function ForYouPage() {
               </h2>
             </div>
             <div className="grid grid-cols-5 gap-5">
-              {loading
-                ? Array(5)
-                    .fill(0)
-                    .map((_, i) => <SkeletonBookCard key={i} />)
-                : suggestedBooks
-                    .slice(0, 5)
-                    .map((book) => <BookCard key={book.id} book={book} />)}
+              {suggestedBooks.slice(0, 5).map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))}
             </div>
           </section>
         </div>

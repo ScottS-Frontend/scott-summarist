@@ -53,15 +53,17 @@ export default function PlayerPage() {
   }, [id]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('playerFontSize');
+    const saved = localStorage.getItem("playerFontSize");
     if (saved) {
-      setFontSize(saved as 'small' | 'medium' | 'large' | 'xlarge');
+      setFontSize(saved as "small" | "medium" | "large" | "xlarge");
     }
   }, []);
 
-  const handleFontSizeChange = (size: 'small' | 'medium' | 'large' | 'xlarge') => {
+  const handleFontSizeChange = (
+    size: "small" | "medium" | "large" | "xlarge",
+  ) => {
     setFontSize(size);
-    localStorage.setItem('playerFontSize', size);
+    localStorage.setItem("playerFontSize", size);
   };
 
   const togglePlay = () => {
@@ -110,7 +112,10 @@ export default function PlayerPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen bg-white">
-        <Sidebar onFontSizeChange={handleFontSizeChange} currentFontSize={fontSize} />
+        <Sidebar
+          onFontSizeChange={handleFontSizeChange}
+          currentFontSize={fontSize}
+        />
         <main className="flex-1 ml-64 flex items-center justify-center">
           <div className="text-[#032b41] text-xl">Loading...</div>
         </main>
@@ -121,7 +126,10 @@ export default function PlayerPage() {
   if (!book) {
     return (
       <div className="flex min-h-screen bg-white">
-        <Sidebar onFontSizeChange={handleFontSizeChange} currentFontSize={fontSize} />
+        <Sidebar
+          onFontSizeChange={handleFontSizeChange}
+          currentFontSize={fontSize}
+        />
         <main className="flex-1 ml-64 flex items-center justify-center">
           <div className="text-[#032b41] text-xl">Book not found</div>
         </main>
@@ -139,7 +147,10 @@ export default function PlayerPage() {
   if (!hasAccess) {
     return (
       <div className="flex min-h-screen bg-white">
-        <Sidebar onFontSizeChange={handleFontSizeChange} currentFontSize={fontSize} />
+        <Sidebar
+          onFontSizeChange={handleFontSizeChange}
+          currentFontSize={fontSize}
+        />
         <main className="flex-1 ml-64 flex flex-col items-center justify-center p-8">
           <div className="text-center max-w-md">
             <h2 className="text-2xl font-bold text-[#032b41] mb-4">
@@ -180,7 +191,10 @@ export default function PlayerPage() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar onFontSizeChange={handleFontSizeChange} currentFontSize={fontSize} />
+      <Sidebar
+        onFontSizeChange={handleFontSizeChange}
+        currentFontSize={fontSize}
+      />
 
       <main className="flex-1 ml-64 flex flex-col min-h-screen relative">
         {/* Search Header */}

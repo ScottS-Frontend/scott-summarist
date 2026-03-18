@@ -22,3 +22,11 @@ export interface UserSubscription {
   status: 'basic' | 'premium' | 'premium-plus';
   expiresAt?: Date;
 }
+
+export interface User {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  subscription?: 'free' | 'basic' | 'premium' | 'premium-plus';
+}

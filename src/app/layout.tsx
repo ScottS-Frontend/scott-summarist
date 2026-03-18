@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReduxProvider } from "@/store/Provider";
-import { Roboto } from 'next/font/google';
+import { Roboto } from "next/font/google";
 
-const roboto = Roboto ({
-  subsets: ['latin'],
-  weight: ['100', '300', '400', '500', '700', '900'],
-  variable: '--font-roboto',
-})
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["100", "300", "400", "500", "700", "900"],
+  variable: "--font-roboto",
+});
 
 const inter = Inter({ subsets: ["latin"] });
 

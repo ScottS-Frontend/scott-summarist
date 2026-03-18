@@ -13,6 +13,7 @@ import { getProducts, Product } from "@/lib/payments";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import type { AppDispatch } from "@/store/store";
+import ChoosePlanSkeleton from "@/components/SkeletonChoosePlan";
 
 const features = [
   {
@@ -35,25 +36,34 @@ const features = [
 const faqs = [
   {
     question: "How does the free 7-day trial work?",
-    answer: "Begin your complimentary 7-day trial with a Summarist annual membership. You are under no obligation to continue your subscription, and you will only be billed when the trial period expires.",
+    answer:
+      "Begin your complimentary 7-day trial with a Summarist annual membership. You are under no obligation to continue your subscription, and you will only be billed when the trial period expires.",
   },
   {
     question: "Can I switch subscriptions from monthly to yearly?",
-    answer: "While an annual plan is active, it is not feasible to switch to a monthly plan. However, once the current month ends, transitioning from a monthly plan to an annual plan is an option.",
+    answer:
+      "While an annual plan is active, it is not feasible to switch to a monthly plan. However, once the current month ends, transitioning from a monthly plan to an annual plan is an option.",
   },
   {
     question: "What's included in the Premium plan?",
-    answer: "Premium membership provides you with the ultimate Summarist experience, including unrestricted entry to many best-selling books high-quality audio.",
+    answer:
+      "Premium membership provides you with the ultimate Summarist experience, including unrestricted entry to many best-selling books high-quality audio.",
   },
   {
     question: "Can I cancel during my trial?",
-    answer: "You will not be charged if you cancel your trial before its conclusion.",
+    answer:
+      "You will not be charged if you cancel your trial before its conclusion.",
   },
 ];
 
 const footerLinks = {
   actions: ["Summarist Magazine", "Cancel Subscription", "Help", "Contact us"],
-  usefulLinks: ["Pricing", "Summarist Business", "Gift Cards", "Authors & Publishers"],
+  usefulLinks: [
+    "Pricing",
+    "Summarist Business",
+    "Gift Cards",
+    "Authors & Publishers",
+  ],
   company: ["About", "Careers", "Partners", "Code of Conduct"],
   other: ["Sitemap", "Legal Notice", "Terms of Service", "Privacy Policies"],
 };
@@ -72,8 +82,10 @@ export default function ChoosePlanPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.auth);
-  const { processing, subscription } = useSelector((state: RootState) => state.subscription);
-  
+  const { processing, subscription } = useSelector(
+    (state: RootState) => state.subscription,
+  );
+
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -82,8 +94,8 @@ export default function ChoosePlanPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (!currentUser) {
-        dispatch(openModal('login'));
-        router.push('/');
+        dispatch(openModal("login"));
+        router.push("/");
       }
     });
 
@@ -95,7 +107,7 @@ export default function ChoosePlanPage() {
           setSelectedPlan(prods[0].prices[0].id);
         }
       } catch (error) {
-        console.error('Error loading products:', error);
+        console.error("Error loading products:", error);
       } finally {
         setLoading(false);
       }
@@ -113,7 +125,7 @@ export default function ChoosePlanPage() {
 
   const handleStartTrial = async () => {
     if (!user) {
-      dispatch(openModal('login'));
+      dispatch(openModal("login"));
       return;
     }
 
@@ -126,8 +138,8 @@ export default function ChoosePlanPage() {
   };
 
   const formatPrice = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency: currency,
     }).format(amount / 100);
   };
@@ -135,7 +147,9 @@ export default function ChoosePlanPage() {
   const getPlanCardClasses = (priceId: string) => {
     const isSelected = selectedPlan === priceId;
     return `flex items-center gap-4 p-6 border-2 rounded-lg cursor-pointer mb-4 transition-all ${
-      isSelected ? "border-[#2bd97c] bg-[#f7faf9]" : "border-gray-200 hover:border-gray-300"
+      isSelected
+        ? "border-[#2bd97c] bg-[#f7faf9]"
+        : "border-gray-200 hover:border-gray-300"
     }`;
   };
 
@@ -147,11 +161,7 @@ export default function ChoosePlanPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2bd97c]"></div>
-      </div>
-    );
+    return <ChoosePlanSkeleton />;
   }
 
   return (
@@ -182,9 +192,16 @@ export default function ChoosePlanPage() {
       <main className="max-w-4xl mx-auto px-8 py-12">
         <section className="grid grid-cols-3 gap-6 mb-12">
           {features.map((feature, idx) => (
-            <article key={idx} className="flex flex-col items-center text-center gap-2">
-              <div className="text-[#032b41] w-[60px] h-[60px]">{feature.icon}</div>
-              <div className="text-sm text-[#032b41] font-bold">{feature.title}</div>
+            <article
+              key={idx}
+              className="flex flex-col items-center text-center gap-2"
+            >
+              <div className="text-[#032b41] w-[60px] h-[60px]">
+                {feature.icon}
+              </div>
+              <div className="text-sm text-[#032b41] font-bold">
+                {feature.title}
+              </div>
               <div className="text-sm text-gray-600">{feature.description}</div>
             </article>
           ))}
@@ -195,8 +212,8 @@ export default function ChoosePlanPage() {
             <p className="text-green-800 font-medium">
               You already have an active subscription!
             </p>
-            <button 
-              onClick={() => router.push('/for-you')}
+            <button
+              onClick={() => router.push("/for-you")}
               className="mt-2 bg-[#2bd97c] hover:bg-[#20ba68] text-white font-semibold py-2 px-6 rounded-lg"
             >
               Go to Dashboard
@@ -223,12 +240,18 @@ export default function ChoosePlanPage() {
                     )}
                   </div>
                   <div>
-                    <div className="font-bold text-[#032b41]">{product.name}</div>
+                    <div className="font-bold text-[#032b41]">
+                      {product.name}
+                    </div>
                     <div className="text-lg font-semibold text-[#032b41]">
                       {formatPrice(price.unit_amount, price.currency)}
-                      <span className="text-sm font-normal text-gray-500">/{price.interval || 'one-time'}</span>
+                      <span className="text-sm font-normal text-gray-500">
+                        /{price.interval || "one-time"}
+                      </span>
                     </div>
-                    <div className="text-sm text-gray-500">{product.description || 'Full access to all features'}</div>
+                    <div className="text-sm text-gray-500">
+                      {product.description || "Full access to all features"}
+                    </div>
                   </div>
                 </article>
               ))}
@@ -253,10 +276,15 @@ export default function ChoosePlanPage() {
             className="bg-[#2bd97c] hover:bg-[#20ba68] text-white font-semibold py-3 px-8 rounded-lg transition-colors disabled:opacity-50"
             style={{ width: 300 }}
           >
-            {processing ? 'Processing...' : subscription ? 'Already Subscribed' : 'Start your free 7-day trial'}
+            {processing
+              ? "Processing..."
+              : subscription
+                ? "Already Subscribed"
+                : "Start your free 7-day trial"}
           </button>
           <p className="text-sm text-gray-500 mt-4">
-            Cancel your trial at any time before it ends, and you won&apos;t be charged.
+            Cancel your trial at any time before it ends, and you won&apos;t be
+            charged.
           </p>
         </section>
 
@@ -275,7 +303,9 @@ export default function ChoosePlanPage() {
                 />
               </div>
               {openFaq === idx && (
-                <p className="text-gray-600 pb-4 text-sm leading-relaxed">{faq.answer}</p>
+                <p className="text-gray-600 pb-4 text-sm leading-relaxed">
+                  {faq.answer}
+                </p>
               )}
             </article>
           ))}

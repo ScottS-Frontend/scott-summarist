@@ -1,12 +1,12 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { 
-  createUserWithEmailAndPassword, 
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  User
-} from 'firebase/auth';
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+  User,
+} from "firebase/auth";
+import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 
 // Only store serializable user data
 interface SerializableUser {
@@ -14,7 +14,7 @@ interface SerializableUser {
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
-  subscription?: 'free' | 'premium';
+  subscription?: "free" | "basic" | "premium" | "premium-plus";
 }
 
 interface AuthState {
@@ -30,7 +30,10 @@ const initialState: AuthState = {
 };
 
 // Helper to extract serializable user data
-const getSerializableUser = (user: User | null, subscription?: 'free' | 'premium'): SerializableUser | null => {
+const getSerializableUser = (
+  user: User | null,
+  subscription?: "free" | "basic" | "premium" | "premium-plus",
+): SerializableUser | null => {
   if (!user) return null;
   return {
     uid: user.uid,
@@ -42,12 +45,15 @@ const getSerializableUser = (user: User | null, subscription?: 'free' | 'premium
 };
 
 // Helper to create/update user in Firestore with FREE subscription
-const createUserInFirestore = async (user: User, subscription: 'free' | 'premium' = 'free') => {
-  const userRef = doc(db, 'users', user.uid);
-  
+const createUserInFirestore = async (
+  user: User,
+  subscription: "free" | "basic" | "premium" | "premium-plus" = "free",
+) => {
+  const userRef = doc(db, "users", user.uid);
+
   // Check if user already exists
   const userSnap = await getDoc(userRef);
-  
+
   if (!userSnap.exists()) {
     // New user - create with FREE subscription
     await setDoc(userRef, {
@@ -62,35 +68,46 @@ const createUserInFirestore = async (user: User, subscription: 'free' | 'premium
     return subscription;
   } else {
     // Existing user - return their current subscription
-    const data = userSnapSnap.data();
-    return data.subscription || 'free';
+    const data = userSnap.data();
+    return data.subscription || "free";
   }
 };
 
 export const registerUser = createAsyncThunk(
-  'auth/register',
+  "auth/register",
   async ({ email, password }: { email: string; password: string }) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const subscription = await createUserInFirestore(userCredential.user, 'free');
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
+    const subscription = await createUserInFirestore(
+      userCredential.user,
+      "free",
+    );
     return getSerializableUser(userCredential.user, subscription);
-  }
+  },
 );
 
 export const loginUser = createAsyncThunk(
-  'auth/login',
+  "auth/login",
   async ({ email, password }: { email: string; password: string }) => {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
     const subscription = await createUserInFirestore(userCredential.user);
     return getSerializableUser(userCredential.user, subscription);
-  }
+  },
 );
 
-export const logoutUser = createAsyncThunk('auth/logout', async () => {
+export const logoutUser = createAsyncThunk("auth/logout", async () => {
   await signOut(auth);
 });
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<SerializableUser | null>) => {
@@ -115,7 +132,7 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Registration failed';
+        state.error = action.error.message || "Registration failed";
       })
       // Login
       .addCase(loginUser.pending, (state) => {
@@ -129,7 +146,7 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Login failed';
+        state.error = action.error.message || "Login failed";
       })
       // Logout
       .addCase(logoutUser.fulfilled, (state) => {

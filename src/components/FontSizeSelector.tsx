@@ -1,30 +1,33 @@
-'use client';
+"use client";
 
 interface FontSizeSelectorProps {
   currentSize: string;
-  onSizeChange: (size: 'small' | 'medium' | 'large' | 'xlarge') => void;
+  onSizeChange: (size: "small" | "medium" | "large" | "xlarge") => void;
 }
 
 const FontIcon = ({ size, isActive }: { size: string; isActive: boolean }) => {
   const baseClasses = "w-6 h-6 transition-colors";
-  const colorClass = isActive ? "text-[#032b41]" : "text-gray-400 hover:text-gray-600";
-  
+  const colorClass = isActive
+    ? "text-[#032b41]"
+    : "text-gray-400 hover:text-gray-600";
+
   // Scale icon based on size
-  const scale = {
-    small: '0.75',
-    medium: '1',
-    large: '1.25',
-    xlarge: '1.5'
-  }[size] || '1';
+  const scale =
+    {
+      small: "0.75",
+      medium: "1",
+      large: "1.25",
+      xlarge: "1.5",
+    }[size] || "1";
 
   return (
-    <svg 
-      stroke="currentColor" 
-      fill="currentColor" 
-      strokeWidth="0" 
-      viewBox="0 0 24 24" 
+    <svg
+      stroke="currentColor"
+      fill="currentColor"
+      strokeWidth="0"
+      viewBox="0 0 24 24"
       className={`${baseClasses} ${colorClass}`}
-      height="1em" 
+      height="1em"
       width="1em"
       style={{ transform: `scale(${scale})` }}
       xmlns="http://www.w3.org/2000/svg"
@@ -37,13 +40,15 @@ const FontIcon = ({ size, isActive }: { size: string; isActive: boolean }) => {
   );
 };
 
-export default function FontSizeSelector({ currentSize, onSizeChange }: FontSizeSelectorProps) {
-  console.log("FontSizeSelector rendered, currentSize:", currentSize);  
+export default function FontSizeSelector({
+  currentSize,
+  onSizeChange,
+}: FontSizeSelectorProps) {
   const sizes = [
-    { key: 'small', label: 'Aa', className: 'text-xs' },
-    { key: 'medium', label: 'Aa', className: 'text-sm' },
-    { key: 'large', label: 'Aa', className: 'text-base' },
-    { key: 'xlarge', label: 'Aa', className: 'text-lg' },
+    { key: "small", label: "Aa", className: "text-xs" },
+    { key: "medium", label: "Aa", className: "text-sm" },
+    { key: "large", label: "Aa", className: "text-base" },
+    { key: "xlarge", label: "Aa", className: "text-lg" },
   ] as const;
 
   return (
@@ -52,14 +57,14 @@ export default function FontSizeSelector({ currentSize, onSizeChange }: FontSize
         <button
           key={size.key}
           onClick={() => {
-            console.log("Button clicked:", size.key);
             onSizeChange(size.key);
           }}
           className={`
             p-2 rounded-md transition-all
-            ${currentSize === size.key 
-              ? 'bg-white shadow-sm' 
-              : 'hover:bg-gray-200'
+            ${
+              currentSize === size.key
+                ? "bg-white shadow-sm"
+                : "hover:bg-gray-200"
             }
           `}
           aria-label={`Font size ${size.key}`}

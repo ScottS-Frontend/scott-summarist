@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { Provider } from 'react-redux';
-import { store } from './store';
-import { useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-import { setUser } from './authSlice';
+import { Provider } from "react-redux";
+import { store } from "./store";
+import { useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { setUser } from "./authSlice";
 
 // Helper function to extract serializable user data
 const getSerializableUser = (user: any) => {
