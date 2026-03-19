@@ -15,6 +15,7 @@ import {
   BsPauseFill,
   BsArrowCounterclockwise,
   BsArrowClockwise,
+  BsList,
 } from "react-icons/bs";
 
 export default function PlayerPage() {
@@ -32,6 +33,7 @@ export default function PlayerPage() {
   const [fontSize, setFontSize] = useState<
     "small" | "medium" | "large" | "xlarge"
   >("medium");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Check if this book is in user's library
   const savedBook = savedBooks.find((b) => b.bookId === id);
@@ -169,6 +171,8 @@ export default function PlayerPage() {
     return (
       <div className="flex min-h-screen bg-white">
         <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
           onFontSizeChange={handleFontSizeChange}
           currentFontSize={fontSize}
         />
@@ -180,12 +184,14 @@ export default function PlayerPage() {
   }
 
   if (!book) {
-    return (
-      <div className="flex min-h-screen bg-white">
-        <Sidebar
-          onFontSizeChange={handleFontSizeChange}
-          currentFontSize={fontSize}
-        />
+  return (
+    <div className="flex min-h-screen bg-white">
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onFontSizeChange={handleFontSizeChange}
+        currentFontSize={fontSize}
+      />
         <main className="flex-1 ml-64 flex items-center justify-center">
           <div className="text-[#032b41] text-xl">Book not found</div>
         </main>
@@ -204,6 +210,8 @@ export default function PlayerPage() {
     return (
       <div className="flex min-h-screen bg-white">
         <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
           onFontSizeChange={handleFontSizeChange}
           currentFontSize={fontSize}
         />
@@ -248,18 +256,28 @@ export default function PlayerPage() {
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
         onFontSizeChange={handleFontSizeChange}
         currentFontSize={fontSize}
       />
 
-      <main className="flex-1 ml-64 flex flex-col min-h-screen relative">
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen relative w-full min-w-0">
         {/* Search Header */}
-        <header className="sticky top-0 bg-white border-b border-gray-200 px-8 py-4 z-50 shadow-sm flex justify-end">
-          <SearchBar />
-        </header>
+        <header className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-50 shadow-sm flex items-center justify-end">
+  <SearchBar />
+  
+  {/* Hamburger - Mobile Only */}
+  <button
+  onClick={() => setSidebarOpen(!sidebarOpen)}
+  className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4 flex-shrink-0"
+>
+  <BsList className="w-6 h-6" />
+</button>
+</header>
 
         {/* Summary Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-8 max-w-4xl mx-auto w-full pb-32">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 max-w-4xl mx-auto w-full pb-32">
           <div className="audio__book--summary">
             <div className="audio__book--summary-title font-bold text-xl mb-4 text-[#032b41]">
               {book.title || "Unknown Title"}
