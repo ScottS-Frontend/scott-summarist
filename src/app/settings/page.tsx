@@ -65,7 +65,7 @@ export default function SettingsPage() {
     return (
       <div className="flex min-h-screen bg-white overflow-x-hidden">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="flex-1 lg:ml-64 flex items-center justify-center">
+        <main className="flex-1 md:ml-64 min-w-0 w-full">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-[#032b41] mb-4">
               Login to view your settings
@@ -87,22 +87,23 @@ export default function SettingsPage() {
     <div className="flex min-h-screen bg-white overflow-x-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="flex-1 lg:ml-64 min-w-0 w-full">
-        {/* Header - Search on left, hamburger on right */}
-        <header className="sticky top-0 bg-white border-b border-gray-200 px-4 lg:px-8 py-4 z-10 shadow-sm flex items-center justify-between">
+      <main className="flex-1 md:ml-64 min-w-0 w-full">
+        <header className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-10 shadow-sm flex items-center justify-end">
           <SearchBar />
-          
-          {/* Hamburger - Mobile Only (lg breakpoint = 1024px), on the RIGHT */}
+
+          {/* Hamburger - Mobile Only (md breakpoint = 768px), on the RIGHT */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4 flex-shrink-0"
+            className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4 flex-shrink-0"
           >
             <BsList className="w-6 h-6" />
           </button>
         </header>
 
-        <div className="p-4 lg:p-8 max-w-2xl mx-auto">
-          <h1 className="text-2xl lg:text-3xl font-bold text-[#032b41] mb-8">Settings</h1>
+        <div className="p-4 md:p-8 max-w-2xl mx-auto">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#032b41] mb-8">
+            Settings
+          </h1>
 
           {/* Subscription Section */}
           <div className="bg-[#f7faf9] rounded-lg p-4 lg:p-6 mb-6">

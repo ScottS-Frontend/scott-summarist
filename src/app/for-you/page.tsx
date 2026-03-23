@@ -195,18 +195,17 @@ export default function ForYouPage() {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <main className="flex-1 md:ml-64 min-w-0">
-        {/* Header - FIXED with hamburger on right */}
-        <header className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-10 shadow-sm flex items-center justify-between">
-          <SearchBar />
-          
-          {/* Hamburger Menu - Mobile Only (md breakpoint = 768px) */}
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4"
-          >
-            <BsList className="w-6 h-6" />
-          </button>
-        </header>
+        <header className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-10 shadow-sm flex items-center justify-end">
+  <SearchBar />
+  
+  {/* Hamburger Menu - Mobile Only (md breakpoint = 768px) */}
+  <button
+    onClick={() => setSidebarOpen(true)}
+    className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4"
+  >
+    <BsList className="w-6 h-6" />
+  </button>
+</header>
 
         <div className="p-4 md:p-8 max-w-6xl mx-auto">
           {/* Selected Book Section */}

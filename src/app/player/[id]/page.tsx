@@ -184,14 +184,14 @@ export default function PlayerPage() {
   }
 
   if (!book) {
-  return (
-    <div className="flex min-h-screen bg-white">
-      <Sidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        onFontSizeChange={handleFontSizeChange}
-        currentFontSize={fontSize}
-      />
+    return (
+      <div className="flex min-h-screen bg-white">
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          onFontSizeChange={handleFontSizeChange}
+          currentFontSize={fontSize}
+        />
         <main className="flex-1 ml-64 flex items-center justify-center">
           <div className="text-[#032b41] text-xl">Book not found</div>
         </main>
@@ -265,19 +265,19 @@ export default function PlayerPage() {
       <main className="flex-1 md:ml-64 flex flex-col min-h-screen relative w-full min-w-0">
         {/* Search Header */}
         <header className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-50 shadow-sm flex items-center justify-end">
-  <SearchBar />
-  
-  {/* Hamburger - Mobile Only */}
-  <button
-  onClick={() => setSidebarOpen(!sidebarOpen)}
-  className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4 flex-shrink-0"
->
-  <BsList className="w-6 h-6" />
-</button>
-</header>
+          <SearchBar />
+
+          {/* Hamburger - Mobile Only */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4 flex-shrink-0"
+          >
+            <BsList className="w-6 h-6" />
+          </button>
+        </header>
 
         {/* Summary Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 max-w-4xl mx-auto w-full pb-32">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 max-w-4xl mx-auto w-full pb-24">
           <div className="audio__book--summary">
             <div className="audio__book--summary-title font-bold text-xl mb-4 text-[#032b41]">
               {book.title || "Unknown Title"}
@@ -299,7 +299,7 @@ export default function PlayerPage() {
         </div>
 
         {/* Audio Player - Fixed at bottom, full width */}
-        <div className="fixed bottom-0 left-0 right-0 bg-[#042330] px-8 py-3 z-50">
+        <div className="fixed bottom-0 left-0 right-0 w-screen bg-[#042330] px-8 py-3 z-50">
           <audio
             ref={audioRef}
             src={book.audioLink || ""}
