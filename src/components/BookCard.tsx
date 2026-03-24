@@ -27,17 +27,26 @@ export default function BookCard({ book }: BookCardProps) {
   const { subscription } = useSelector((state: RootState) => state.subscription);
   const audioDuration = useAudioDuration(book.audioLink);
 
+  // Check if user is guest
+  const isGuest = user?.email === "guest@gmail.com";
+
   // Check if user has active subscription from subscriptionSlice
   const hasActiveSubscription =
     subscription &&
     (subscription.status === "active" || subscription.status === "trialing");
 
-  // Show Premium pill if book requires subscription AND user does NOT have active subscription
-  const showPremiumPill = book.subscriptionRequired && !hasActiveSubscription;
+ // Show Premium pill if:
+  // - Book requires subscription
+  // - AND (user is guest OR user does NOT have active subscription)
+  const showPremiumPill = book.subscriptionRequired && (isGuest || !hasActiveSubscription);
+
+  const handleClick = () => {
+  router.push(`/book/${book.id}`);
+};
 
   return (
     <div
-      onClick={() => router.push(`/book/${book.id}`)}
+      onClick={handleClick}
       className="cursor-pointer group relative"
     >
       {/* Premium Pill - Upper Right Corner */}

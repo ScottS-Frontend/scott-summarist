@@ -8,9 +8,9 @@ import Sidebar from "@/components/Sidebar";
 import BookImage from "@/components/BookImage";
 import { useRouter } from "next/navigation";
 import { useAudioDuration } from "@/hooks/useAudioDuration";
-import { useSelector } from "react-redux";
+import { useAppSelector, useAppDispatch } from "@/store/store";
 import SkeletonForYou from "@/components/SkeletonForYou";
-import { RootState } from "@/store/store";
+import { loadSubscription } from "@/store/subscriptionSlice";
 import { BsList } from "react-icons/bs";
 
 // Helper to format seconds to MM:SS
@@ -21,15 +21,25 @@ function formatDuration(seconds: number | null): string {
   return `${min}:${sec < 10 ? "0" + sec : sec}`;
 }
 
-// Component for Selected Book with dynamic duration - WORKING VERSION
+// Component for Selected Book with dynamic duration
 function SelectedBookCard({ book }: { book: Book }) {
   const router = useRouter();
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
+  const { subscription } = useAppSelector((state) => state.subscription);
   const audioDuration = useAudioDuration(book.audioLink);
 
-  const isPremium =
-    user?.subscription === "premium" || user?.subscription === "premium-plus";
-  const showPremiumPill = book.subscriptionRequired && !isPremium;
+  // Check if user is guest
+  const isGuest = user?.email === "guest@gmail.com";
+
+  // Check if user has active subscription from subscriptionSlice
+  const hasActiveSubscription =
+    subscription &&
+    (subscription.status === "active" || subscription.status === "trialing");
+
+  // Show Premium pill if:
+  // - Book requires subscription
+  // - AND (user is guest OR user does NOT have active subscription)
+  const showPremiumPill = book.subscriptionRequired && (isGuest || !hasActiveSubscription);
 
   return (
     <a
@@ -119,7 +129,9 @@ function SelectedBookCard({ book }: { book: Book }) {
 
           {/* Text content */}
           <div className="flex flex-col gap-1 min-w-0 w-[140px]">
-            <div className="font-bold text-[#032b41] text-lg leading-tight">{book.title}</div>
+            <div className="font-bold text-[#032b41] text-lg leading-tight">
+              {book.title}
+            </div>
             <div className="text-gray-600 text-sm">{book.author}</div>
             <div className="flex items-center gap-2 text-gray-500 text-xs mt-1">
               <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center flex-shrink-0">
@@ -145,11 +157,18 @@ function SelectedBookCard({ book }: { book: Book }) {
 
 // MAIN PAGE COMPONENT
 export default function ForYouPage() {
+  const dispatch = useAppDispatch();
+  
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
   const [suggestedBooks, setSuggestedBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Load subscription
+  useEffect(() => {
+    dispatch(loadSubscription());
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -196,16 +215,16 @@ export default function ForYouPage() {
 
       <main className="flex-1 md:ml-64 min-w-0">
         <header className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-10 shadow-sm flex items-center justify-end">
-  <SearchBar />
-  
-  {/* Hamburger Menu - Mobile Only (md breakpoint = 768px) */}
-  <button
-    onClick={() => setSidebarOpen(true)}
-    className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4"
-  >
-    <BsList className="w-6 h-6" />
-  </button>
-</header>
+          <SearchBar />
+
+          {/* Hamburger Menu - Mobile Only (md breakpoint = 768px) */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4"
+          >
+            <BsList className="w-6 h-6" />
+          </button>
+        </header>
 
         <div className="p-4 md:p-8 max-w-6xl mx-auto">
           {/* Selected Book Section */}
@@ -223,7 +242,7 @@ export default function ForYouPage() {
                 Recommended For You
               </h2>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
               {recommendedBooks.slice(0, 5).map((book) => (
                 <BookCard key={book.id} book={book} />
               ))}
@@ -237,7 +256,7 @@ export default function ForYouPage() {
                 Suggested Books
               </h2>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
               {suggestedBooks.slice(0, 5).map((book) => (
                 <BookCard key={book.id} book={book} />
               ))}

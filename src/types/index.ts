@@ -48,3 +48,11 @@ export interface LibraryState {
   loading: boolean;
   error: string | null;
 }
+
+export interface SubscriptionState {
+  subscription: any | null;
+  loading: boolean;
+  error: string | null;
+  processing: boolean;
+}
+

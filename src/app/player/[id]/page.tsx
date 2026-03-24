@@ -5,8 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { Book } from "@/types";
 import { RootState, AppDispatch } from "@/store/store";
+import { loadSubscription } from "@/store/subscriptionSlice";
 import { openModal } from "@/store/modalSlice";
-import { loadLibrary, updateBookProgress } from "@/store/library/librarySlice";
+import {
+  loadLibrary,
+  updateBookProgress,
+  addToLibrary,
+} from "@/store/library/librarySlice";
 import Sidebar from "@/components/Sidebar";
 import SearchBar from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
@@ -24,6 +29,7 @@ export default function PlayerPage() {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
   const { savedBooks } = useSelector((state: RootState) => state.library);
+  const { subscription , loading: subscriptionLoading } = useSelector((state: RootState) => state.subscription,);
   const [book, setBook] = useState<Book | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -64,6 +70,14 @@ export default function PlayerPage() {
   // Load library and restore progress
   useEffect(() => {
     if (user) {
+      dispatch(loadLibrary());
+    }
+  }, [user, dispatch]);
+
+  // Add useEffect to load subscription
+  useEffect(() => {
+    if (user) {
+      dispatch(loadSubscription());
       dispatch(loadLibrary());
     }
   }, [user, dispatch]);
@@ -154,34 +168,28 @@ export default function PlayerPage() {
   };
 
   // Handle audio ended - mark as finished
-  const handleEnded = useCallback(() => {
+  const handleEnded = useCallback(async () => {
     setIsPlaying(false);
-    if (user && book && audioRef.current) {
+    if (!user || !book) return;
+
+    try {
+      // First, ensure book is in library (add if not exists)
+      if (!isInLibrary) {
+        await dispatch(addToLibrary(book.id)).unwrap();
+      }
+
+      // Then mark as finished with full duration
       dispatch(
         updateBookProgress({
           bookId: book.id,
-          currentTime: audioRef.current.duration,
-          duration: audioRef.current.duration,
+          currentTime: audioRef.current?.duration || 0,
+          duration: audioRef.current?.duration || 0,
         }),
       );
+    } catch (error) {
+      console.error("Error handling audio end:", error);
     }
-  }, [user, book, dispatch]);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen bg-white">
-        <Sidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onFontSizeChange={handleFontSizeChange}
-          currentFontSize={fontSize}
-        />
-        <main className="flex-1 ml-64 flex items-center justify-center">
-          <div className="text-[#032b41] text-xl">Loading...</div>
-        </main>
-      </div>
-    );
-  }
+  }, [user, book, isInLibrary, dispatch]);
 
   if (!book) {
     return (
@@ -203,7 +211,14 @@ export default function PlayerPage() {
   const isGuest = user?.email === "guest@gmail.com";
   const needsSubscription = book.subscriptionRequired === true;
   const isLoggedIn = !!user;
-  const hasAccess = !needsSubscription || (isLoggedIn && !isGuest);
+
+  // Check subscription from subscriptionSlice
+  const hasActiveSubscription =
+    subscription &&
+    (subscription.status === "active" || subscription.status === "trialing");
+
+  const hasAccess =
+    !needsSubscription || (isLoggedIn && !isGuest && hasActiveSubscription);
 
   // Show access denied screen
   if (!hasAccess) {
@@ -299,6 +314,7 @@ export default function PlayerPage() {
         </div>
 
         {/* Audio Player - Fixed at bottom, full width */}
+        {/* Audio Player - Fixed at bottom, full width */}
         <div className="fixed bottom-0 left-0 right-0 w-screen bg-[#042330] px-8 py-3 z-50">
           <audio
             ref={audioRef}
@@ -378,14 +394,20 @@ export default function PlayerPage() {
               <span className="text-xs text-gray-400">
                 {formatTime(currentTime)}
               </span>
+
               <input
                 type="range"
                 min={0}
                 max={duration || 100}
                 value={currentTime}
                 onChange={handleSeek}
-                className="flex-1 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-[#2bd97c]"
+                className="flex-1 h-1 rounded-lg appearance-none cursor-pointer"
+                style={{
+                  background: `linear-gradient(to right, #0365f2 0%, #0365f2 ${duration ? (currentTime / duration) * 100 : 0}%, #4b5563 ${duration ? (currentTime / duration) * 100 : 0}%, #4b5563 100%)`,
+                  height: "4px",
+                }}
               />
+
               <span className="text-xs text-gray-400">
                 {formatTime(duration)}
               </span>

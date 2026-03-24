@@ -179,7 +179,7 @@ export default function Sidebar({
           {user ? (
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#032b41] hover:bg-[#e3e9e7] transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#032b41] hover:bg-[#e3e9e7] transition-colors cursor-pointer"
             >
               <BsBoxArrowRight className="w-5 h-5" />
               <span className="font-medium">Logout</span>

@@ -105,10 +105,9 @@ export default function BookDetailPage() {
 
   if (!book) return <div>Book not found</div>;
 
-  const hasActiveSubscription =
-    subscription &&
-    (subscription.status === "active" || subscription.status === "trialing");
-  const showPremiumLabel = book.subscriptionRequired && !hasActiveSubscription;
+  const isPremiumUser =
+    subscription?.role === "premium" || subscription?.role === "premium-plus";
+  const showPremiumLabel = book.subscriptionRequired && !isPremiumUser;
   const needsSubscription = book.subscriptionRequired === true;
 
   const handleReadListen = () => {
@@ -122,7 +121,9 @@ export default function BookDetailPage() {
       return;
     }
 
-    if (needsSubscription && !hasActiveSubscription) {
+    // Check if guest or no active subscription
+    const isGuest = user?.email === "guest@gmail.com";
+    if (needsSubscription && (isGuest || !subscription)) {
       router.push("/choose-plan");
       return;
     }
@@ -158,11 +159,18 @@ export default function BookDetailPage() {
           {/* Stacked Layout (≤1024px): Book cover on top */}
           <div className="lg:hidden">
             <div className="w-full flex justify-center mb-6">
-              <BookImage
-                book={book}
-                className="w-[280px] h-[380px] md:w-[320px] md:h-[440px]"
-                showHoverEffect={false}
-              />
+              <div className="relative">
+                {showPremiumLabel && (
+                  <div className="absolute top-2 right-2 z-20 bg-[#032b41] text-white text-xs font-bold px-3 py-1 rounded-full">
+                    Premium
+                  </div>
+                )}
+                <BookImage
+                  book={book}
+                  className="w-[280px] h-[380px] md:w-[320px] md:h-[440px]"
+                  showHoverEffect={false}
+                />
+              </div>
             </div>
 
             <div>
@@ -394,7 +402,12 @@ export default function BookDetailPage() {
               </p>
             </div>
 
-            <div className="w-80 flex-shrink-0">
+            <div className="w-80 flex-shrink-0 relative">
+              {showPremiumLabel && (
+                <div className="absolute top-2 right-2 z-20 bg-[#032b41] text-white text-xs font-bold px-3 py-1 rounded-full">
+                  Premium
+                </div>
+              )}
               <BookImage
                 book={book}
                 className="w-full h-[420px]"

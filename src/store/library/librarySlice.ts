@@ -79,11 +79,14 @@ export const addToLibrary = createAsyncThunk(
         });
       } else {
         const data = snapshot.data();
-        const savedBooks = data.savedBooks || [];
+        const savedBooks: UserBook[] = data.savedBooks || [];
+        const finishedBooks: UserBook[] = data.finishedBooks || [];
         
-        // Check if already saved
-        if (!savedBooks.find((b: UserBook) => b.bookId === bookId)) {
-          // Use spread instead of arrayUnion for complex objects
+        // Check if already in saved or finished
+        const alreadySaved = savedBooks.find((b: UserBook) => b.bookId === bookId);
+        const alreadyFinished = finishedBooks.find((b: UserBook) => b.bookId === bookId);
+        
+        if (!alreadySaved && !alreadyFinished) {
           await updateDoc(libraryRef, {
             savedBooks: [...savedBooks, userBook],
             updatedAt: Timestamp.now(),
@@ -99,7 +102,7 @@ export const addToLibrary = createAsyncThunk(
   }
 );
 
-// Remove book from library
+// Remove book from library (handles both saved and finished)
 export const removeFromLibrary = createAsyncThunk(
   'library/remove',
   async (bookId: string, { rejectWithValue }) => {
@@ -110,11 +113,16 @@ export const removeFromLibrary = createAsyncThunk(
       if (!snapshot.exists()) return bookId;
       
       const data = snapshot.data();
-      const savedBooks = data.savedBooks || [];
-      const updatedBooks = savedBooks.filter((b: UserBook) => b.bookId !== bookId);
+      const savedBooks: UserBook[] = data.savedBooks || [];
+      const finishedBooks: UserBook[] = data.finishedBooks || [];
+      
+      // Remove from both arrays
+      const updatedSavedBooks = savedBooks.filter((b: UserBook) => b.bookId !== bookId);
+      const updatedFinishedBooks = finishedBooks.filter((b: UserBook) => b.bookId !== bookId);
       
       await updateDoc(libraryRef, {
-        savedBooks: updatedBooks,
+        savedBooks: updatedSavedBooks,
+        finishedBooks: updatedFinishedBooks,
         updatedAt: Timestamp.now(),
       });
       
@@ -136,14 +144,14 @@ export const updateBookProgress = createAsyncThunk(
       if (!snapshot.exists()) throw new Error('Library not found');
       
       const data = snapshot.data();
-      const savedBooks = data.savedBooks || [];
-      const finishedBooks = data.finishedBooks || [];
+      const savedBooks: UserBook[] = data.savedBooks || [];
+      const finishedBooks: UserBook[] = data.finishedBooks || [];
       
+      const isFinished = duration > 0 && currentTime >= duration - 10;
       let newlyFinished: UserBook | null = null;
       
       const updatedBooks = savedBooks.map((book: UserBook) => {
         if (book.bookId === bookId) {
-          const isFinished = duration > 0 && currentTime >= duration - 10;
           const updatedBook = {
             ...book,
             currentTime,
@@ -162,12 +170,16 @@ export const updateBookProgress = createAsyncThunk(
         return book;
       });
       
-      const updatedFinishedBooks = newlyFinished 
-        ? [...finishedBooks, newlyFinished]
-        : finishedBooks;
+      // If newly finished, remove from savedBooks and add to finishedBooks
+      let updatedFinishedBooks = finishedBooks;
+      if (newlyFinished) {
+        updatedFinishedBooks = [...finishedBooks, newlyFinished];
+      }
       
       await updateDoc(libraryRef, {
-        savedBooks: updatedBooks,
+        savedBooks: newlyFinished 
+          ? updatedBooks.filter((b: UserBook) => b.bookId !== bookId) 
+          : updatedBooks,
         finishedBooks: updatedFinishedBooks,
         updatedAt: Timestamp.now(),
       });
@@ -202,18 +214,35 @@ const librarySlice = createSlice({
         state.savedBooks.push(action.payload);
       })
       .addCase(removeFromLibrary.fulfilled, (state, action) => {
-        state.savedBooks = state.savedBooks.filter(b => b.bookId !== action.payload);
+        const bookId = action.payload;
+        state.savedBooks = state.savedBooks.filter((b: UserBook) => b.bookId !== bookId);
+        state.finishedBooks = state.finishedBooks.filter((b: UserBook) => b.bookId !== bookId);
       })
       .addCase(updateBookProgress.fulfilled, (state, action) => {
         const { bookId, currentTime, duration, finished } = action.payload;
-        const book = state.savedBooks.find(b => b.bookId === bookId);
-        if (book) {
-          book.currentTime = currentTime;
-          book.duration = duration;
-          if (finished) {
-            book.finished = true;
-            book.finishedAt = new Date().toISOString();
-            state.finishedBooks.push(book);
+        
+        if (finished) {
+          // Remove from savedBooks
+          state.savedBooks = state.savedBooks.filter((b: UserBook) => b.bookId !== bookId);
+          // Add to finishedBooks if not already there
+          if (!state.finishedBooks.find((b: UserBook) => b.bookId === bookId)) {
+            const finishedBook: UserBook = {
+              bookId,
+              currentTime,
+              duration,
+              finished: true,
+              finishedAt: new Date().toISOString(),
+              savedAt: new Date().toISOString(),
+              lastAccessedAt: new Date().toISOString(),
+            };
+            state.finishedBooks.push(finishedBook);
+          }
+        } else {
+          // Just update progress in savedBooks
+          const book = state.savedBooks.find((b: UserBook) => b.bookId === bookId);
+          if (book) {
+            book.currentTime = currentTime;
+            book.duration = duration;
           }
         }
       });

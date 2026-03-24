@@ -11,7 +11,7 @@ import SearchBar from "@/components/SearchBar";
 import BookCard from "@/components/BookCard";
 import SkeletonLibrary from "@/components/SkeletonLibrary";
 import { Book } from "@/types";
-import { BsTrash, BsList } from "react-icons/bs";
+import { BsList } from "react-icons/bs";
 
 interface BookWithProgress extends Book {
   currentTime?: number;
@@ -23,10 +23,14 @@ export default function LibraryPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.auth);
-  const { savedBooks, finishedBooks, loading } = useSelector((state: RootState) => state.library);
-  
+  const { savedBooks, finishedBooks, loading } = useSelector(
+    (state: RootState) => state.library,
+  );
+
   const [savedBooksData, setSavedBooksData] = useState<BookWithProgress[]>([]);
-  const [finishedBooksData, setFinishedBooksData] = useState<BookWithProgress[]>([]);
+  const [finishedBooksData, setFinishedBooksData] = useState<
+    BookWithProgress[]
+  >([]);
   const [fetchingBooks, setFetchingBooks] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -53,35 +57,85 @@ export default function LibraryPage() {
         return;
       }
 
-      const allBookIds = [...new Set([...savedBooks.map(b => b.bookId), ...finishedBooks.map(b => b.bookId)])];
-      
+      // Filter out invalid book IDs
+      const validSavedBooks = savedBooks.filter(
+        (b) => b.bookId && typeof b.bookId === "string",
+      );
+      const validFinishedBooks = finishedBooks.filter(
+        (b) => b.bookId && typeof b.bookId === "string",
+      );
+
+      const allBookIds = [
+        ...new Set([
+          ...validSavedBooks.map((b) => b.bookId),
+          ...validFinishedBooks.map((b) => b.bookId),
+        ]),
+      ].filter((id) => id);
+
+      if (allBookIds.length === 0) {
+        setFetchingBooks(false);
+        return;
+      }
+
       try {
         const booksData = await Promise.all(
           allBookIds.map(async (bookId) => {
-            const res = await fetch(`https://us-central1-summaristt.cloudfunctions.net/getBook?id=${bookId}`);
-            return res.json();
-          })
+            try {
+              const res = await fetch(
+                `https://us-central1-summaristt.cloudfunctions.net/getBook?id=${bookId}`,
+              );
+              const text = await res.text();
+              if (!text || text.trim() === "") return null;
+              try {
+                return JSON.parse(text);
+              } catch (parseErr) {
+                return null;
+              }
+            } catch (err) {
+              return null;
+            }
+          }),
         );
 
-        // Merge book data with progress - ONLY include unfinished books in saved
-        const savedWithProgress = savedBooks
-          .filter(saved => !saved.finished)
-          .map(saved => ({
-            ...booksData.find(b => b.id === saved.bookId),
-            currentTime: saved.currentTime,
-            duration: saved.duration,
-            finished: saved.finished,
-          })).filter(Boolean);
+        const validBooksData = booksData.filter(Boolean);
 
-        const finishedWithProgress = finishedBooks.map(finished => ({
-          ...booksData.find(b => b.id === finished.bookId),
-          currentTime: finished.currentTime,
-          duration: finished.duration,
-          finished: true,
-        })).filter(Boolean);
+        const savedWithProgress = validSavedBooks
+          .filter((saved) => !saved.finished)
+          .map((saved) => {
+            const bookData = validBooksData.find((b) => b?.id === saved.bookId);
+            if (!bookData) return null;
+            return {
+              ...bookData,
+              currentTime: saved.currentTime,
+              duration: saved.duration,
+              finished: saved.finished,
+            };
+          })
+          .filter(Boolean) as BookWithProgress[];
+
+        const finishedWithProgress = validFinishedBooks
+          .map((finished) => {
+            const bookData = validBooksData.find(
+              (b) => b?.id === finished.bookId,
+            );
+            if (!bookData) return null;
+            return {
+              ...bookData,
+              currentTime: finished.currentTime,
+              duration: finished.duration,
+              finished: true,
+            };
+          })
+          .filter(Boolean) as BookWithProgress[];
+
+        // Remove duplicates (book in both arrays)
+        const savedIds = new Set(savedWithProgress.map((b) => b.id));
+        const uniqueFinished = finishedWithProgress.filter(
+          (b) => !savedIds.has(b.id),
+        );
 
         setSavedBooksData(savedWithProgress);
-        setFinishedBooksData(finishedWithProgress);
+        setFinishedBooksData(uniqueFinished);
       } catch (error) {
         console.error("Error fetching books:", error);
       }
@@ -108,18 +162,17 @@ export default function LibraryPage() {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <main className="flex-1 md:ml-64 min-w-0 w-full">
-        
         <header className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-10 shadow-sm flex items-center justify-end">
-  <SearchBar />
-  
-  {/* Hamburger */}
-  <button
-    onClick={() => setSidebarOpen(true)}
-    className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4 flex-shrink-0"
-  >
-    <BsList className="w-6 h-6" />
-  </button>
-</header>
+          <SearchBar />
+
+          {/* Hamburger */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4 flex-shrink-0"
+          >
+            <BsList className="w-6 h-6" />
+          </button>
+        </header>
 
         <div className="p-4 md:p-8 max-w-6xl mx-auto">
           {/* Saved Books Section */}
@@ -131,15 +184,7 @@ export default function LibraryPage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-5">
                 {savedBooksData.map((book) => (
                   <div key={book.id} className="relative group">
-                    <BookCard book={book} />
-                    {/* Remove button */}
-                    <button
-                      onClick={() => handleRemove(book.id)}
-                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                      title="Remove from library"
-                    >
-                      <BsTrash className="w-4 h-4" />
-                    </button>
+                    <BookCard book={book} />                    
                   </div>
                 ))}
               </div>

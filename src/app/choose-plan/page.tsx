@@ -222,71 +222,78 @@ export default function ChoosePlanPage() {
         )}
 
         <section className="max-w-[680px] mx-auto">
-          <h2 className="text-xl font-bold text-[#032b41] text-center mb-8">
-            Choose the plan that fits you
-          </h2>
+  <h2 className="text-xl font-bold text-[#032b41] text-center mb-8">
+    Choose the plan that fits you
+  </h2>
 
-          {products.map((product) => (
-            <div key={product.id}>
-              {product.prices.map((price) => (
-                <article
-                  key={price.id}
-                  onClick={() => setSelectedPlan(price.id)}
-                  className={getPlanCardClasses(price.id)}
-                >
-                  <div className={getRadioCircleClasses(price.id)}>
-                    {selectedPlan === price.id && (
-                      <div className="w-3 h-3 rounded-full bg-[#2bd97c]" />
-                    )}
-                  </div>
-                  <div>
-                    <div className="font-bold text-[#032b41]">
-                      {product.name}
-                    </div>
-                    <div className="text-lg font-semibold text-[#032b41]">
-                      {formatPrice(price.unit_amount, price.currency)}
-                      <span className="text-sm font-normal text-gray-500">
-                        /{price.interval || "one-time"}
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {product.description || "Full access to all features"}
-                    </div>
-                  </div>
-                </article>
-              ))}
+  {products.map((product, productIndex) => (
+    <div key={product.id}>
+      {product.prices.map((price) => (
+        <article
+          key={price.id}
+          onClick={() => setSelectedPlan(price.id)}
+          className={getPlanCardClasses(price.id)}
+        >
+          <div className={getRadioCircleClasses(price.id)}>
+            {selectedPlan === price.id && (
+              <div className="w-3 h-3 rounded-full bg-[#2bd97c]" />
+            )}
+          </div>
+          <div>
+            <div className="font-bold text-[#032b41]">
+              {product.name}
             </div>
-          ))}
-
-          {!products.length && !loading && (
-            <div className="text-center text-gray-500 mb-8">
-              <p>No plans available yet.</p>
+            <div className="text-lg font-semibold text-[#032b41]">
+              {formatPrice(price.unit_amount, price.currency)}
+              <span className="text-sm font-normal text-gray-500">
+                /{price.interval || "one-time"}
+              </span>
             </div>
-          )}
-        </section>
-
-        <div className="flex items-center justify-center my-6">
+            <div className="text-sm text-gray-500">
+              {product.description || "Full access to all features"}
+            </div>
+          </div>
+        </article>
+      ))}
+      
+      {/* Add divider after first product (between the two plans) */}
+      {productIndex === 0 && products.length > 1 && (
+        <div className="flex items-center gap-4 my-6">
+          <div className="flex-1 h-px bg-gray-200"></div>
           <span className="text-gray-400 font-medium">or</span>
+          <div className="flex-1 h-px bg-gray-200"></div>
         </div>
+      )}
+    </div>
+  ))}
 
-        <section className="text-center">
-          <button
-            onClick={handleStartTrial}
-            disabled={processing || !!subscription || !selectedPlan}
-            className="bg-[#2bd97c] hover:bg-[#20ba68] text-white font-semibold py-3 px-8 rounded-lg transition-colors disabled:opacity-50"
-            style={{ width: 300 }}
-          >
-            {processing
-              ? "Processing..."
-              : subscription
-                ? "Already Subscribed"
-                : "Start your free 7-day trial"}
-          </button>
-          <p className="text-sm text-gray-500 mt-4">
-            Cancel your trial at any time before it ends, and you won&apos;t be
-            charged.
-          </p>
-        </section>
+  {!products.length && !loading && (
+    <div className="text-center text-gray-500 mb-8">
+      <p>No plans available yet.</p>
+    </div>
+  )}
+</section>
+
+<section className="text-center">
+  <button
+    onClick={handleStartTrial}
+    disabled={processing || !!subscription || !selectedPlan}
+    className="bg-[#2bd97c] hover:bg-[#20ba68] text-white font-semibold py-3 px-8 rounded-lg transition-colors disabled:opacity-50"
+    style={{ width: 300 }}
+  >
+    {processing
+      ? "Processing..."
+      : subscription
+        ? "Already Subscribed"
+        : "Start your free 7-day trial"}
+  </button>
+  <p className="text-sm text-gray-500 mt-4">
+    Cancel your trial at any time before it ends, and you won&apos;t be
+    charged.
+  </p>
+</section>
+
+        
 
         <section className="mt-12">
           {faqs.map((faq, idx) => (
