@@ -136,7 +136,6 @@ export default function BookDetailPage() {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <main className="flex-1 md:ml-64 min-w-0 w-full">
-        {/* Header - Search right, hamburger at ≤768px */}
         <header className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-10 shadow-sm flex items-center justify-end">
           <SearchBar />
 
@@ -240,7 +239,7 @@ export default function BookDetailPage() {
                 </button>
               </div>
 
-              {/* MOBILE: Bookmark Button - CORRECT */}
+              {/* MOBILE: Bookmark Button */}
               <button
                 onClick={handleAddToLibrary}
                 disabled={isAdding}

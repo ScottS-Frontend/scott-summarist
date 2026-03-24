@@ -20,7 +20,7 @@ interface BookCardProps {
   book: Book;
 }
 
-// THIS IS THE COMPONENT FOR RECOMMENDED/SUGGESTED GRID ITEMS
+// ECOMMENDED/SUGGESTED GRID ITEMS
 export default function BookCard({ book }: BookCardProps) {
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.auth);

@@ -256,11 +256,10 @@ export default function ChoosePlanPage() {
         </article>
       ))}
       
-      {/* Add divider after first product (between the two plans) */}
       {productIndex === 0 && products.length > 1 && (
         <div className="flex items-center gap-4 my-6">
           <div className="flex-1 h-px bg-gray-200"></div>
-          <span className="text-gray-400 font-medium">or</span>
+          <span className="text-gray-400 font-medium">OR</span>
           <div className="flex-1 h-px bg-gray-200"></div>
         </div>
       )}

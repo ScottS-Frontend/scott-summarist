@@ -313,8 +313,7 @@ export default function PlayerPage() {
           </div>
         </div>
 
-        {/* Audio Player - Fixed at bottom, full width */}
-        {/* Audio Player - Fixed at bottom, full width */}
+        {/* Audio Player - Fixed at bottom, full width */}        
         <div className="fixed bottom-0 left-0 right-0 w-screen bg-[#042330] px-8 py-3 z-50">
           <audio
             ref={audioRef}
