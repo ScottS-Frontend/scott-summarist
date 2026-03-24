@@ -7,11 +7,12 @@ import { Book } from "@/types";
 import { AppDispatch, RootState } from "@/store/store";
 import { openModal } from "@/store/modalSlice";
 import { loadSubscription } from "@/store/subscriptionSlice";
-import { addToLibrary } from "@/store/library/librarySlice";
+import { addToLibrary, removeFromLibrary } from "@/store/library/librarySlice";
 import Sidebar from "@/components/Sidebar";
 import SearchBar from "@/components/SearchBar";
 import {
   BsBookmark,
+  BsBookmarkFill,
   BsStar,
   BsClock,
   BsLightbulb,
@@ -80,18 +81,20 @@ export default function BookDetailPage() {
       return;
     }
 
-    if (isBookSaved) {
-      alert("This book is already in your library!");
-      return;
-    }
-
     setIsAdding(true);
     try {
-      await dispatch(addToLibrary(id as string)).unwrap();
-      alert("Added to library!");
+      if (isBookSaved) {
+        // Remove from library
+        await dispatch(removeFromLibrary(id as string)).unwrap();
+        alert("Removed from library!");
+      } else {
+        // Add to library
+        await dispatch(addToLibrary(id as string)).unwrap();
+        alert("Added to library!");
+      }
     } catch (error: any) {
       console.error("Full error:", error);
-      alert(`Failed to add book: ${error.message || error}`);
+      alert(`Failed to update library: ${error.message || error}`);
     }
     setIsAdding(false);
   };
@@ -202,7 +205,7 @@ export default function BookDetailPage() {
                 <button
                   onClick={handleReadListen}
                   disabled={subscriptionLoading && needsSubscription}
-                  className={`flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors ${subscriptionLoading && needsSubscription ? "opacity-50 cursor-wait" : ""}`}
+                  className={`flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors cursor-pointer ${subscriptionLoading && needsSubscription ? "opacity-50 cursor-wait" : ""}`}
                 >
                   <svg
                     className="w-5 h-5"
@@ -216,7 +219,7 @@ export default function BookDetailPage() {
                 <button
                   onClick={handleReadListen}
                   disabled={subscriptionLoading && needsSubscription}
-                  className={`flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors ${subscriptionLoading && needsSubscription ? "opacity-50 cursor-wait" : ""}`}
+                  className={`flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors cursor-pointer ${subscriptionLoading && needsSubscription ? "opacity-50 cursor-wait" : ""}`}
                 >
                   <svg
                     className="w-5 h-5"
@@ -229,19 +232,20 @@ export default function BookDetailPage() {
                 </button>
               </div>
 
+              {/* MOBILE: Bookmark Button - CORRECT */}
               <button
                 onClick={handleAddToLibrary}
-                disabled={isAdding || isBookSaved}
-                className={`flex items-center gap-2 text-[#0365f2] hover:text-blue-700 mb-10 transition-colors font-bold cursor-pointer ${isBookSaved || isAdding ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={isAdding}
+                className={`flex items-center gap-2 text-[#0365f2] hover:text-blue-700 mb-10 transition-colors font-bold cursor-pointer ${isAdding ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 <BsBookmark
-                  className={`w-5 h-5 ${isBookSaved ? "fill-current" : ""}`}
+                  className={`w-5 h-5 ${isBookSaved ? "fill-[#0365f2] text-[#0365f2]" : ""}`}
                 />
                 <span className="text-sm">
                   {isBookSaved
                     ? "In My Library"
                     : isAdding
-                      ? "Adding..."
+                      ? "Processing..."
                       : "Add title to My Library"}
                 </span>
               </button>
@@ -318,7 +322,7 @@ export default function BookDetailPage() {
                 <button
                   onClick={handleReadListen}
                   disabled={subscriptionLoading && needsSubscription}
-                  className={`flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors ${subscriptionLoading && needsSubscription ? "opacity-50 cursor-wait" : ""}`}
+                  className={`flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors cursor-pointer ${subscriptionLoading && needsSubscription ? "opacity-50 cursor-wait" : ""}`}
                 >
                   <svg
                     className="w-5 h-5"
@@ -332,7 +336,7 @@ export default function BookDetailPage() {
                 <button
                   onClick={handleReadListen}
                   disabled={subscriptionLoading && needsSubscription}
-                  className={`flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors ${subscriptionLoading && needsSubscription ? "opacity-50 cursor-wait" : ""}`}
+                  className={`flex items-center gap-2 bg-black text-white border border-black rounded px-6 py-3 hover:bg-gray-800 transition-colors cursor-pointer ${subscriptionLoading && needsSubscription ? "opacity-50 cursor-wait" : ""}`}
                 >
                   <svg
                     className="w-5 h-5"
@@ -345,19 +349,22 @@ export default function BookDetailPage() {
                 </button>
               </div>
 
+              {/* DESKTOP: Bookmark Button */}
               <button
                 onClick={handleAddToLibrary}
-                disabled={isAdding || isBookSaved}
-                className={`flex items-center gap-2 text-[#0365f2] hover:text-blue-700 mb-10 transition-colors font-bold cursor-pointer ${isBookSaved || isAdding ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={isAdding}
+                className={`flex items-center gap-2 text-[#0365f2] hover:text-blue-700 mb-10 transition-colors font-bold cursor-pointer ${isAdding ? "opacity-50 cursor-not-allowed" : ""}`}
               >
-                <BsBookmark
-                  className={`w-5 h-5 ${isBookSaved ? "fill-current" : ""}`}
-                />
+                {isBookSaved ? (
+                  <BsBookmarkFill className="w-5 h-5 text-[#0365f2]" />
+                ) : (
+                  <BsBookmark className="w-5 h-5 text-[#0365f2]" />
+                )}
                 <span className="text-sm">
                   {isBookSaved
                     ? "In My Library"
                     : isAdding
-                      ? "Adding..."
+                      ? "Processing..."
                       : "Add title to My Library"}
                 </span>
               </button>

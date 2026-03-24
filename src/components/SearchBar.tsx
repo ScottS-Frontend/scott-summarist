@@ -53,9 +53,9 @@ export default function SearchBar() {
   }, [query, searchBooks]);
 
   return (
-    <div className="flex items-center">
+    <div className="relative flex-1 max-w-[360px]">
       {/* Search Input with Dropdown */}
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full">
         <input
           type="text"
           placeholder="Search for books"
