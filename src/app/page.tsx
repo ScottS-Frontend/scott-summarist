@@ -99,7 +99,7 @@ export default function HomePage() {
                 and even people who don't like to read.
               </p>
               <button
-                className="bg-[#2bd97c] text-[#032b41] w-full max-w-[280px] md:max-w-[300px] h-10 rounded text-[16px] transition-colors hover:bg-[#20ba68] flex items-center justify-center font-normal mx-auto md:mx-0"
+                className="bg-[#2bd97c] text-[#032b41] w-full max-w-[280px] md:max-w-[300px] h-10 rounded text-[16px] transition-colors hover:bg-[#20ba68] flex items-center justify-center font-normal mx-auto md:mx-0 cursor-pointer"
                 onClick={() =>
                   user ? router.push("/for-you") : dispatch(openModal("login"))
                 }

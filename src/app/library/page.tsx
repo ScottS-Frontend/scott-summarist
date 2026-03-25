@@ -161,27 +161,27 @@ export default function LibraryPage() {
     <div className="flex min-h-screen bg-[#f7faf9] overflow-x-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="flex-1 md:ml-64 min-w-0 w-full">
-        <header className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-10 shadow-sm flex items-center justify-end">
+      <main className="flex-1 lg:ml-64 min-w-0 w-full">
+        <header className="sticky top-0 bg-white border-b border-gray-200 px-4 lg:px-8 py-4 z-10 shadow-sm flex items-center justify-end">
           <SearchBar />
 
           {/* Hamburger */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4 flex-shrink-0"
+            className="lg:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4 flex-shrink-0"
           >
             <BsList className="w-6 h-6" />
           </button>
         </header>
 
-        <div className="p-4 md:p-8 max-w-6xl mx-auto">
+        <div className="p-4 lg:p-8 max-w-6xl mx-auto">
           {/* Saved Books Section */}
           <section className="mb-12 lg:mb-16">
             <h2 className="text-lg lg:text-[22px] font-bold text-[#032b41] mb-4 lg:mb-6">
               Saved Books ({savedBooksData.length})
             </h2>
             {savedBooksData.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-5">
                 {savedBooksData.map((book) => (
                   <div key={book.id} className="relative group">
                     <BookCard book={book} />                    
@@ -207,7 +207,7 @@ export default function LibraryPage() {
               <h2 className="text-lg lg:text-[22px] font-bold text-[#032b41] mb-4 lg:mb-6">
                 Finished Books ({finishedBooksData.length})
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-5">
                 {finishedBooksData.map((book) => (
                   <div key={book.id} className="relative">
                     <BookCard book={book} />

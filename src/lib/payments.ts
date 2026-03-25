@@ -66,6 +66,8 @@ export const createCheckoutSession = async (priceId: string): Promise<void> => {
 
   if (!user) throw new Error("You must be logged in to subscribe");
 
+  localStorage.setItem('checkoutUserId', user.uid);
+
   const userRef = doc(db, "users", user.uid);
   const checkoutSessionsRef = collection(userRef, "checkout_sessions");
 

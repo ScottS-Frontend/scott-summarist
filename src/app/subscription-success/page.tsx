@@ -2,19 +2,45 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { loadSubscription } from "../../store/subscriptionSlice";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
-import { AppDispatch } from "@/store/store";
+import { AppDispatch, RootState } from "@/store/store";
 
 export default function SubscriptionSuccessPage() {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
 
-  const dispatch = useDispatch<AppDispatch>(); // ✅ Hook at top level
   useEffect(() => {
-    dispatch(loadSubscription());
-  }, [dispatch]);
+    const checkoutUserId = localStorage.getItem("checkoutUserId");
+
+    const timer = setTimeout(() => {
+      const auth = getAuth();
+
+      if (!auth.currentUser && checkoutUserId) {
+        localStorage.removeItem("checkoutUserId");
+        window.location.reload();
+      } else if (auth.currentUser) {
+        localStorage.removeItem("checkoutUserId");
+        dispatch(loadSubscription());
+      } else {
+        router.push("/");
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [dispatch, router]);
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Restoring your session...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-4">
@@ -34,7 +60,7 @@ export default function SubscriptionSuccessPage() {
 
         <Button
           onClick={() => router.push("/for-you")}
-          className="w-full bg-[#2bd97c] hover:bg-[#20ba68] text-white h-12 font-semibold text-lg"
+          className="w-full bg-[#2bd97c] hover:bg-[#20ba68] text-white h-12 font-semibold text-lg cursor-pointer"
         >
           Start Reading
         </Button>

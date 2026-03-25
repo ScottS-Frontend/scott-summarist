@@ -21,6 +21,7 @@ const getSerializableUser = (user: any) => {
 export function ReduxProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("Provider - auth state changed:", user?.email, user?.uid);
       // Convert to serializable before dispatching
       store.dispatch(setUser(getSerializableUser(user)));
     });

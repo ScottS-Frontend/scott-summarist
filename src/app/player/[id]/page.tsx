@@ -200,7 +200,7 @@ export default function PlayerPage() {
           onFontSizeChange={handleFontSizeChange}
           currentFontSize={fontSize}
         />
-        <main className="flex-1 ml-64 flex items-center justify-center">
+        <main className="flex-1 lg:ml-64 flex items-center justify-center">
           <div className="text-[#032b41] text-xl">Book not found</div>
         </main>
       </div>
@@ -230,7 +230,7 @@ export default function PlayerPage() {
           onFontSizeChange={handleFontSizeChange}
           currentFontSize={fontSize}
         />
-        <main className="flex-1 ml-64 flex flex-col items-center justify-center p-8">
+        <main className="flex-1 lg:ml-64 flex flex-col items-center justify-center p-8">
           <div className="text-center max-w-md">
             <h2 className="text-2xl font-bold text-[#032b41] mb-4">
               {!isLoggedIn ? "Login Required" : "Premium Content"}
@@ -277,22 +277,22 @@ export default function PlayerPage() {
         currentFontSize={fontSize}
       />
 
-      <main className="flex-1 md:ml-64 flex flex-col min-h-screen relative w-full min-w-0">
+      <main className="flex-1 lg:ml-64 flex flex-col min-h-screen relative w-full min-w-0">
         {/* Search Header */}
-        <header className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-50 shadow-sm flex items-center justify-end">
+        <header className="sticky top-0 bg-white border-b border-gray-200 px-4 lg:px-8 py-4 z-50 shadow-sm flex items-center justify-end">
           <SearchBar />
 
           {/* Hamburger - Mobile Only */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4 flex-shrink-0"
+            className="lg:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4 flex-shrink-0"
           >
             <BsList className="w-6 h-6" />
           </button>
         </header>
 
         {/* Summary Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 max-w-4xl mx-auto w-full pb-24">
+        <div className="flex-1 overflow-y-auto p-4 lg:p-8 max-w-4xl mx-auto w-full pb-24">
           <div className="audio__book--summary">
             <div className="audio__book--summary-title font-bold text-xl mb-4 text-[#032b41]">
               {book.title || "Unknown Title"}

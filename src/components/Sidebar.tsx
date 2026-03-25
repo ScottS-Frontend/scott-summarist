@@ -88,7 +88,7 @@ export default function Sidebar({
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 block md:hidden"
+          className="fixed inset-0 bg-black/50 z-40 block lg:hidden"
           onClick={onClose}
         />
       )}
@@ -99,19 +99,19 @@ export default function Sidebar({
   transition-transform duration-300 ease-in-out overflow-y-auto
   w-64
   ${isOpen ? "translate-x-0" : "-translate-x-full"}
-  md:translate-x-0
+  lg:translate-x-0
 `}
       >
         {/* Close button for mobile */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-[#032b41] md:hidden hover:bg-[#e3e9e7] rounded-lg z-[70]"
+          className="absolute top-4 right-4 p-2 text-[#032b41] lg:hidden hover:bg-[#e3e9e7] rounded-lg z-[70]"
         >
           <BsX className="w-6 h-6" />
         </button>
 
         {/* Logo */}
-        <div className="p-6 pt-8 md:pt-6">
+        <div className="p-6 pt-8 lg:pt-6">
           <Image
             src="/assets/logo.png"
             alt="Summarist"

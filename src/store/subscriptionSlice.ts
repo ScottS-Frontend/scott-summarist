@@ -17,25 +17,13 @@ const initialState: SubscriptionState = {
   processing: false,
 };
 
-// Helper to serialize Firestore data
+// Helper to serialize Firestore data - keep it minimal and serializable
 const serializeSubscription = (data: any) => {
   return {
     id: data.id,
     status: data.status,
-    price_id: data.price_id,
-    product_id: data.product_id,
-    current_period_start:
-      data.current_period_start?.toDate?.().toISOString() ||
-      data.current_period_start,
-    current_period_end:
-      data.current_period_end?.toDate?.().toISOString() ||
-      data.current_period_end,
-    created: data.created?.toDate?.().toISOString() || data.created,
-    cancel_at_period_end: data.cancel_at_period_end,
-    canceled_at: data.canceled_at?.toDate?.().toISOString() || data.canceled_at,
-    role: data.role,
-    metadata: data.metadata,
-    prices: [], // Don't include prices array from subscription
+    current_period_start: data.current_period_start?.toDate?.().toISOString(),
+    current_period_end: data.current_period_end?.toDate?.().toISOString(),
   };
 };
 
@@ -45,6 +33,7 @@ export const loadSubscription = createAsyncThunk(
     try {
       const auth = getAuth();
       const user = auth.currentUser;
+      
       if (!user) return null;
 
       const userRef = doc(db, "users", user.uid);
@@ -92,6 +81,12 @@ const subscriptionSlice = createSlice({
     clearSubscriptionError: (state) => {
       state.error = null;
     },
+    clearSubscription: (state) => {
+      state.subscription = null;
+      state.loading = false;
+      state.error = null;
+      state.processing = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -121,5 +116,5 @@ const subscriptionSlice = createSlice({
   },
 });
 
-export const { clearSubscriptionError } = subscriptionSlice.actions;
+export const { clearSubscriptionError, clearSubscription } = subscriptionSlice.actions;
 export default subscriptionSlice.reducer;

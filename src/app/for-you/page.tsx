@@ -44,7 +44,7 @@ function SelectedBookCard({ book }: { book: Book }) {
   return (
     <a
       href={`/book/${book.id}`}
-      className="bg-[#fbefd6] rounded-lg p-4 md:p-6 shadow-sm border border-[#f0e6d2] cursor-pointer hover:shadow-md transition-shadow w-full max-w-[624px] block no-underline mb-6 relative"
+      className="bg-[#fbefd6] rounded-lg p-4 lg:p-6 shadow-sm border border-[#f0e6d2] cursor-pointer hover:shadow-md transition-shadow w-full max-w-[624px] block no-underline mb-6 relative"
       onClick={(e) => {
         e.preventDefault();
         router.push(`/book/${book.id}`);
@@ -58,7 +58,7 @@ function SelectedBookCard({ book }: { book: Book }) {
       )}
 
       {/* Mobile Layout (≤768px): Stacked vertically */}
-      <div className="md:hidden">
+      <div className="lg:hidden">
         {/* Subtitle on top - full width */}
         <div className="text-sm text-gray-800 mb-4 leading-relaxed">
           {book.subTitle}
@@ -105,7 +105,7 @@ function SelectedBookCard({ book }: { book: Book }) {
       </div>
 
       {/* Desktop Layout (>768px): Side by side */}
-      <div className="hidden md:flex items-start min-h-[140px]">
+      <div className="hidden lg:flex items-start min-h-[140px]">
         {/* Subtitle - left side */}
         <div className="flex-1 pr-6 text-lg text-gray-700 italic font-medium leading-relaxed self-center">
           &ldquo;{book.subTitle}&rdquo;
@@ -213,14 +213,14 @@ export default function ForYouPage() {
     <div className="flex min-h-screen bg-[#f7faf9] overflow-x-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="flex-1 md:ml-64 min-w-0">
-        <header className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-10 shadow-sm flex items-center justify-end">
+      <main className="flex-1 lg:ml-64 min-w-0">
+        <header className="sticky top-0 bg-white border-b border-gray-200 px-4 lg:px-8 py-4 z-10 shadow-sm flex items-center justify-end">
           <SearchBar />
 
           {/* Hamburger Menu - Mobile Only (md breakpoint = 768px) */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4"
+            className="lg:hidden p-2 text-[#032b41] hover:bg-gray-100 rounded-lg ml-4"
           >
             <BsList className="w-6 h-6" />
           </button>
@@ -242,7 +242,7 @@ export default function ForYouPage() {
                 Recommended For You
               </h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 lg:gap-6">
               {recommendedBooks.slice(0, 5).map((book) => (
                 <BookCard key={book.id} book={book} />
               ))}
@@ -256,7 +256,7 @@ export default function ForYouPage() {
                 Suggested Books
               </h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 lg:gap-6">
               {suggestedBooks.slice(0, 5).map((book) => (
                 <BookCard key={book.id} book={book} />
               ))}
